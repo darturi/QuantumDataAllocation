@@ -1,0 +1,2477 @@
+{
+    "metadata": {
+        "date": "2026-05-13",
+        "time": "09:16:28",
+        "total_cases": 400,
+        "num_reads": 1000,
+        "num_sweeps": 1000,
+        "solvers": [
+            "ILP",
+            "SQA"
+        ],
+        "note": "Arbitrary-partition benchmark: variable partition sizes."
+    },
+    "results": {
+        "n-2_p-12_1": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_1.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 215.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 56,
+                    "valid": false,
+                    "time_ms": 24056.0,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_10": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_10.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 58,
+                    "valid": false,
+                    "time_ms": 24093.3,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_2": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_2.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 46.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 166,
+                    "valid": false,
+                    "time_ms": 23977.4,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_3": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_3.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 72,
+                    "valid": false,
+                    "time_ms": 25132.6,
+                    "bqm_variables": 41,
+                    "bqm_interactions": 412,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_4": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_4.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 92,
+                    "valid": false,
+                    "time_ms": 23893.0,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_5": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_5.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 18,
+                    "valid": false,
+                    "time_ms": 24121.8,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_6": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_6.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 131,
+                    "valid": false,
+                    "time_ms": 23935.7,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_7": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_7.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": false,
+                    "time_ms": 24210.1,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_8": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_8.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 14,
+                    "valid": false,
+                    "time_ms": 23957.3,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-12_9": {
+            "source_file": "arbitrary_partition/tier1/n2_p12/n-2_p-12_9.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.2,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 49,
+                    "valid": false,
+                    "time_ms": 24134.8,
+                    "bqm_variables": 40,
+                    "bqm_interactions": 392,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_1": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_1.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 348,
+                    "valid": false,
+                    "time_ms": 42639.1,
+                    "bqm_variables": 54,
+                    "bqm_interactions": 720,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_10": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_10.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 22.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 281,
+                    "valid": false,
+                    "time_ms": 42303.5,
+                    "bqm_variables": 54,
+                    "bqm_interactions": 720,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_2": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_2.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 96,
+                    "valid": false,
+                    "time_ms": 40535.9,
+                    "bqm_variables": 53,
+                    "bqm_interactions": 694,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_3": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_3.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 24.2,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 279,
+                    "valid": false,
+                    "time_ms": 40775.1,
+                    "bqm_variables": 53,
+                    "bqm_interactions": 694,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_4": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_4.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 275,
+                    "valid": false,
+                    "time_ms": 42234.4,
+                    "bqm_variables": 54,
+                    "bqm_interactions": 720,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_5": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_5.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 54.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 84,
+                    "valid": false,
+                    "time_ms": 41051.8,
+                    "bqm_variables": 53,
+                    "bqm_interactions": 694,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_6": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_6.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 22.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 114,
+                    "valid": false,
+                    "time_ms": 42524.1,
+                    "bqm_variables": 54,
+                    "bqm_interactions": 720,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_7": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_7.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 27.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 182,
+                    "valid": false,
+                    "time_ms": 41074.9,
+                    "bqm_variables": 53,
+                    "bqm_interactions": 694,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_8": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_8.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 22.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 178,
+                    "valid": false,
+                    "time_ms": 41123.0,
+                    "bqm_variables": 53,
+                    "bqm_interactions": 694,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-18_9": {
+            "source_file": "arbitrary_partition/tier1/n2_p18/n-2_p-18_9.json",
+            "n_nodes": 2,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 24.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 294,
+                    "valid": false,
+                    "time_ms": 42423.5,
+                    "bqm_variables": 54,
+                    "bqm_interactions": 720,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_1": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_1.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 388,
+                    "valid": false,
+                    "time_ms": 71057.9,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_10": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_10.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 52.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 292,
+                    "valid": false,
+                    "time_ms": 70882.6,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_2": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_2.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 23.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 362,
+                    "valid": false,
+                    "time_ms": 71190.3,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_3": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_3.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 27.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 350,
+                    "valid": false,
+                    "time_ms": 71464.2,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_4": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_4.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 32.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 264,
+                    "valid": false,
+                    "time_ms": 71365.0,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_5": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_5.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 64.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 227,
+                    "valid": false,
+                    "time_ms": 70506.0,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_6": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_6.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 24.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 638,
+                    "valid": false,
+                    "time_ms": 69883.3,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_7": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_7.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 365,
+                    "valid": false,
+                    "time_ms": 69942.6,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_8": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_8.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 27.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 291,
+                    "valid": false,
+                    "time_ms": 70020.5,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-26_9": {
+            "source_file": "arbitrary_partition/tier1/n2_p26/n-2_p-26_9.json",
+            "n_nodes": 2,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.7,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 218,
+                    "valid": false,
+                    "time_ms": 70327.4,
+                    "bqm_variables": 70,
+                    "bqm_interactions": 1216,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_1": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_1.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 45.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 6631.3,
+                    "bqm_variables": 20,
+                    "bqm_interactions": 93,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_10": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_10.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 18.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 5651.4,
+                    "bqm_variables": 18,
+                    "bqm_interactions": 75,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_2": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_2.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 5619.2,
+                    "bqm_variables": 18,
+                    "bqm_interactions": 75,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_3": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_3.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 5787.2,
+                    "bqm_variables": 18,
+                    "bqm_interactions": 75,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_4": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_4.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 6853.9,
+                    "bqm_variables": 20,
+                    "bqm_interactions": 93,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_5": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_5.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 5675.9,
+                    "bqm_variables": 18,
+                    "bqm_interactions": 75,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_6": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_6.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 5668.6,
+                    "bqm_variables": 18,
+                    "bqm_interactions": 75,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_7": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_7.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 18.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 5588.1,
+                    "bqm_variables": 18,
+                    "bqm_interactions": 75,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_8": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_8.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 5584.8,
+                    "bqm_variables": 18,
+                    "bqm_interactions": 75,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-3_9": {
+            "source_file": "arbitrary_partition/tier1/n2_p3/n-2_p-3_9.json",
+            "n_nodes": 2,
+            "n_partitions": 3,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 5626.4,
+                    "bqm_variables": 18,
+                    "bqm_interactions": 75,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_1": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_1.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 493,
+                    "valid": false,
+                    "time_ms": 118403.9,
+                    "bqm_variables": 92,
+                    "bqm_interactions": 2106,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_10": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_10.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 25.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 512,
+                    "valid": false,
+                    "time_ms": 119126.3,
+                    "bqm_variables": 92,
+                    "bqm_interactions": 2106,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_2": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_2.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 57.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 623,
+                    "valid": false,
+                    "time_ms": 113717.7,
+                    "bqm_variables": 90,
+                    "bqm_interactions": 2016,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_3": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_3.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 45.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 392,
+                    "valid": false,
+                    "time_ms": 116616.3,
+                    "bqm_variables": 91,
+                    "bqm_interactions": 2061,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_4": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_4.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 24.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 524,
+                    "valid": false,
+                    "time_ms": 116367.9,
+                    "bqm_variables": 90,
+                    "bqm_interactions": 2016,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_5": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_5.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 55.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 473,
+                    "valid": false,
+                    "time_ms": 118478.5,
+                    "bqm_variables": 91,
+                    "bqm_interactions": 2061,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_6": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_6.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 27.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 664,
+                    "valid": false,
+                    "time_ms": 118004.9,
+                    "bqm_variables": 91,
+                    "bqm_interactions": 2061,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_7": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_7.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 24.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 691,
+                    "valid": false,
+                    "time_ms": 119083.8,
+                    "bqm_variables": 92,
+                    "bqm_interactions": 2106,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_8": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_8.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 109.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 526,
+                    "valid": false,
+                    "time_ms": 119276.0,
+                    "bqm_variables": 92,
+                    "bqm_interactions": 2106,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-36_9": {
+            "source_file": "arbitrary_partition/tier1/n2_p36/n-2_p-36_9.json",
+            "n_nodes": 2,
+            "n_partitions": 36,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 48.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 636,
+                    "valid": false,
+                    "time_ms": 114314.6,
+                    "bqm_variables": 90,
+                    "bqm_interactions": 2016,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_1": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_1.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 7564.5,
+                    "bqm_variables": 21,
+                    "bqm_interactions": 104,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_10": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_10.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 7480.9,
+                    "bqm_variables": 21,
+                    "bqm_interactions": 104,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_2": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_2.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 1,
+                    "valid": false,
+                    "time_ms": 7930.8,
+                    "bqm_variables": 22,
+                    "bqm_interactions": 114,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_3": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_3.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 18.7,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 7922.5,
+                    "bqm_variables": 22,
+                    "bqm_interactions": 114,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_4": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_4.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 18.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 6761.3,
+                    "bqm_variables": 20,
+                    "bqm_interactions": 94,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_5": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_5.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 7919.6,
+                    "bqm_variables": 22,
+                    "bqm_interactions": 114,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_6": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_6.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 6750.5,
+                    "bqm_variables": 20,
+                    "bqm_interactions": 94,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_7": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_7.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 18.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 6740.4,
+                    "bqm_variables": 20,
+                    "bqm_interactions": 94,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_8": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_8.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 7356.7,
+                    "bqm_variables": 21,
+                    "bqm_interactions": 104,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-4_9": {
+            "source_file": "arbitrary_partition/tier1/n2_p4/n-2_p-4_9.json",
+            "n_nodes": 2,
+            "n_partitions": 4,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 18.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 6782.1,
+                    "bqm_variables": 20,
+                    "bqm_interactions": 94,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_1": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_1.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 23.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 725,
+                    "valid": false,
+                    "time_ms": 198252.9,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_10": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_10.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 22.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 583,
+                    "valid": false,
+                    "time_ms": 196678.1,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_2": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_2.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 646,
+                    "valid": false,
+                    "time_ms": 196175.3,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_3": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_3.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 880,
+                    "valid": false,
+                    "time_ms": 195089.8,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_4": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_4.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 580,
+                    "valid": false,
+                    "time_ms": 196058.2,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_5": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_5.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 58.1,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 705,
+                    "valid": false,
+                    "time_ms": 197627.4,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_6": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_6.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.7,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 529,
+                    "valid": false,
+                    "time_ms": 195512.8,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_7": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_7.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 652,
+                    "valid": false,
+                    "time_ms": 195685.9,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_8": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_8.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 40.7,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 483,
+                    "valid": false,
+                    "time_ms": 197697.6,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-50_9": {
+            "source_file": "arbitrary_partition/tier1/n2_p50/n-2_p-50_9.json",
+            "n_nodes": 2,
+            "n_partitions": 50,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 24.2,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 503,
+                    "valid": false,
+                    "time_ms": 198389.6,
+                    "bqm_variables": 120,
+                    "bqm_interactions": 3590,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_1": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_1.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 43.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 13892.8,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 218,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_10": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_10.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 44,
+                    "valid": false,
+                    "time_ms": 13930.4,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 218,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_2": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_2.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 53.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 6,
+                    "valid": false,
+                    "time_ms": 15492.3,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 248,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_3": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_3.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 84,
+                    "valid": false,
+                    "time_ms": 13738.1,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 218,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_4": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_4.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 21.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 36,
+                    "valid": false,
+                    "time_ms": 15411.5,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 248,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_5": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_5.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 20.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 12,
+                    "valid": false,
+                    "time_ms": 13877.9,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 218,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_6": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_6.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 18,
+                    "valid": false,
+                    "time_ms": 14518.7,
+                    "bqm_variables": 31,
+                    "bqm_interactions": 233,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_7": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_7.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 12,
+                    "valid": false,
+                    "time_ms": 15368.2,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 248,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_8": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_8.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 19.2,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 33,
+                    "valid": false,
+                    "time_ms": 14664.6,
+                    "bqm_variables": 31,
+                    "bqm_interactions": 233,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-2_p-8_9": {
+            "source_file": "arbitrary_partition/tier1/n2_p8/n-2_p-8_9.json",
+            "n_nodes": 2,
+            "n_partitions": 8,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "time_ms": 23.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 32,
+                    "valid": false,
+                    "time_ms": 15026.6,
+                    "bqm_variables": 31,
+                    "bqm_interactions": 233,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_1": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_1.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 99,
+                    "valid": true,
+                    "time_ms": 29.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 249,
+                    "valid": false,
+                    "time_ms": 36932.1,
+                    "bqm_variables": 60,
+                    "bqm_interactions": 606,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_10": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_10.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 128,
+                    "valid": true,
+                    "time_ms": 23.0,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 253,
+                    "valid": false,
+                    "time_ms": 36911.7,
+                    "bqm_variables": 60,
+                    "bqm_interactions": 606,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_2": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_2.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 163,
+                    "valid": true,
+                    "time_ms": 63.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 268,
+                    "valid": false,
+                    "time_ms": 34478.7,
+                    "bqm_variables": 58,
+                    "bqm_interactions": 568,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_3": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_3.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 200,
+                    "valid": true,
+                    "time_ms": 27.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 421,
+                    "valid": false,
+                    "time_ms": 35621.5,
+                    "bqm_variables": 59,
+                    "bqm_interactions": 587,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_4": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_4.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 80,
+                    "valid": true,
+                    "time_ms": 23.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 349,
+                    "valid": false,
+                    "time_ms": 37083.2,
+                    "bqm_variables": 60,
+                    "bqm_interactions": 606,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_5": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_5.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 118,
+                    "valid": true,
+                    "time_ms": 48.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 196,
+                    "valid": false,
+                    "time_ms": 36370.5,
+                    "bqm_variables": 60,
+                    "bqm_interactions": 606,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_6": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_6.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 235,
+                    "valid": true,
+                    "time_ms": 21.7,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 245,
+                    "valid": false,
+                    "time_ms": 34653.8,
+                    "bqm_variables": 58,
+                    "bqm_interactions": 568,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_7": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_7.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 120,
+                    "valid": true,
+                    "time_ms": 22.2,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 319,
+                    "valid": false,
+                    "time_ms": 35020.9,
+                    "bqm_variables": 59,
+                    "bqm_interactions": 587,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_8": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_8.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 179,
+                    "valid": true,
+                    "time_ms": 21.2,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 357,
+                    "valid": false,
+                    "time_ms": 34443.6,
+                    "bqm_variables": 58,
+                    "bqm_interactions": 568,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-12_9": {
+            "source_file": "arbitrary_partition/tier1/n3_p12/n-3_p-12_9.json",
+            "n_nodes": 3,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 91,
+                    "valid": true,
+                    "time_ms": 22.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 236,
+                    "valid": false,
+                    "time_ms": 32950.1,
+                    "bqm_variables": 57,
+                    "bqm_interactions": 549,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_1": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_1.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 260,
+                    "valid": true,
+                    "time_ms": 22.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 585,
+                    "valid": false,
+                    "time_ms": 60636.4,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_10": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_10.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 178,
+                    "valid": true,
+                    "time_ms": 24.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 528,
+                    "valid": false,
+                    "time_ms": 60670.3,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_2": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_2.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 212,
+                    "valid": true,
+                    "time_ms": 25.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 412,
+                    "valid": false,
+                    "time_ms": 62201.2,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_3": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_3.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 111,
+                    "valid": true,
+                    "time_ms": 50.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 647,
+                    "valid": false,
+                    "time_ms": 61308.5,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_4": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_4.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 186,
+                    "valid": true,
+                    "time_ms": 20.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 417,
+                    "valid": false,
+                    "time_ms": 60365.4,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_5": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_5.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 275,
+                    "valid": true,
+                    "time_ms": 23.6,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 612,
+                    "valid": false,
+                    "time_ms": 60606.4,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_6": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_6.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 303,
+                    "valid": true,
+                    "time_ms": 20.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 583,
+                    "valid": false,
+                    "time_ms": 63355.2,
+                    "bqm_variables": 80,
+                    "bqm_interactions": 1081,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_7": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_7.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 195,
+                    "valid": true,
+                    "time_ms": 20.9,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 546,
+                    "valid": false,
+                    "time_ms": 60744.1,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_8": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_8.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 290,
+                    "valid": true,
+                    "time_ms": 20.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 622,
+                    "valid": false,
+                    "time_ms": 60415.7,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-18_9": {
+            "source_file": "arbitrary_partition/tier1/n3_p18/n-3_p-18_9.json",
+            "n_nodes": 3,
+            "n_partitions": 18,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 202,
+                    "valid": true,
+                    "time_ms": 20.5,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 300,
+                    "valid": false,
+                    "time_ms": 60576.7,
+                    "bqm_variables": 78,
+                    "bqm_interactions": 1029,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-26_1": {
+            "source_file": "arbitrary_partition/tier1/n3_p26/n-3_p-26_1.json",
+            "n_nodes": 3,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 320,
+                    "valid": true,
+                    "time_ms": 21.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 747,
+                    "valid": false,
+                    "time_ms": 101974.6,
+                    "bqm_variables": 103,
+                    "bqm_interactions": 1795,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-26_10": {
+            "source_file": "arbitrary_partition/tier1/n3_p26/n-3_p-26_10.json",
+            "n_nodes": 3,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 321,
+                    "valid": true,
+                    "time_ms": 21.4,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 681,
+                    "valid": false,
+                    "time_ms": 104601.4,
+                    "bqm_variables": 104,
+                    "bqm_interactions": 1829,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-26_2": {
+            "source_file": "arbitrary_partition/tier1/n3_p26/n-3_p-26_2.json",
+            "n_nodes": 3,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 275,
+                    "valid": true,
+                    "time_ms": 33.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 795,
+                    "valid": false,
+                    "time_ms": 105169.2,
+                    "bqm_variables": 105,
+                    "bqm_interactions": 1863,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-26_3": {
+            "source_file": "arbitrary_partition/tier1/n3_p26/n-3_p-26_3.json",
+            "n_nodes": 3,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 362,
+                    "valid": true,
+                    "time_ms": 27.8,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 917,
+                    "valid": false,
+                    "time_ms": 99647.9,
+                    "bqm_variables": 102,
+                    "bqm_interactions": 1761,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-26_4": {
+            "source_file": "arbitrary_partition/tier1/n3_p26/n-3_p-26_4.json",
+            "n_nodes": 3,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 275,
+                    "valid": true,
+                    "time_ms": 22.3,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 682,
+                    "valid": false,
+                    "time_ms": 101521.2,
+                    "bqm_variables": 103,
+                    "bqm_interactions": 1795,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-26_5": {
+            "source_file": "arbitrary_partition/tier1/n3_p26/n-3_p-26_5.json",
+            "n_nodes": 3,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 327,
+                    "valid": true,
+                    "time_ms": 23.2,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 714,
+                    "valid": false,
+                    "time_ms": 105138.9,
+                    "bqm_variables": 105,
+                    "bqm_interactions": 1863,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        },
+        "n-3_p-26_6": {
+            "source_file": "arbitrary_partition/tier1/n3_p26/n-3_p-26_6.json",
+            "n_nodes": 3,
+            "n_partitions": 26,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 264,
+                    "valid": true,
+                    "time_ms": 22.7,
+                    "error": null
+                },
+                "SQA": {
+                    "cost": 684,
+                    "valid": false,
+                    "time_ms": 104686.8,
+                    "bqm_variables": 104,
+                    "bqm_interactions": 1829,
+                    "error": null,
+                    "optimality_gap": null
+                }
+            }
+        }
+    }
+}

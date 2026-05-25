@@ -1,0 +1,16 @@
+.venv/
+.idea/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+build/
+dist/
+.DS_Store
+2211.13914v4.pdf
+CRITICAL_REVIEW.md
+EXECUTION_SUMMARY.md
+pyproject.toml
+QuantumAllocation.pdf
+REMEDIATION_PLAN.md

@@ -1,0 +1,17 @@
+{
+    "metadata": {
+        "date": "2026-05-15",
+        "time": "16:53:00",
+        "total_cases": 1600,
+        "num_reads": 1000,
+        "solvers": [
+            "ILP",
+            "SQA",
+            "SQA_SF"
+        ],
+        "harness_version": "phase5",
+        "num_sweeps": 1000,
+        "note": "Unit-partition benchmark: test_bank cases drawn with size_p = 1.  All solvers in the default registry also support arbitrary sizes -- see the arbitrary-partition runner."
+    },
+    "results": {}
+}

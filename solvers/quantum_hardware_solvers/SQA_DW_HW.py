@@ -1,22 +1,28 @@
 """
-S3 Hardware — QPU version of the Domain-Wall + Slack-Free SQA solver.
+S3 Hardware -- QPU version of the Domain-Wall + Unbalanced-Penalty solver.
 
-Reuses the BQM construction from SQADomainWallSolver (domain-wall
-k-safety encoding + unbalanced penalty for storage) and submits it
-to a real D-Wave QPU.
+Reuses the BQM construction from SQADomainWallSolver (Chancellor-style
+domain-wall k-safety chain + calibrated unbalanced storage) and submits
+it to a real D-Wave QPU.
 
-The domain-wall encoding's O(|N|) chain structure (nearest-neighbour
-couplings for the wall variables) should embed more naturally into
-D-Wave's sparse hardware graph than the O(|N|^2) all-to-all coupling
-of the standard k-safety penalty — this is one of the key hypotheses
-the hardware experiments can test.
+S3 is **opt-in** even on hardware -- it is excluded from the default
+``_get_hw_registry()`` and requires ``include_s3=True`` to be included.
+The reason is the same one that excludes it on the simulated side:
+the W-to-A linking constraint reintroduces O(|N|^2) couplings, so the
+advertised coupling reduction does not materialise on the data-
+allocation problem.  On sparse hardware topologies this typically
+makes embeddings strictly worse than S2's.
 
-Restrictions:
-    - All partition sizes must equal 1 (same as simulated S3).
+The original docstring framed S3 as a key hypothesis to test on
+hardware.  After the audit and the Phase-3 rewrite, the hypothesis is
+falsified at the encoding level on this problem class; the file is
+kept for reproducibility, not advocacy.
 
-Usage:
-    solver = SQADWHardwareSolver(nodes, partitions, k_safety, requests, comm_costs)
-    time_ms, result = solver.solve(num_reads=100, annealing_time=20)
+Usage (opt in):
+    from util.experiment_execution.run_unit_partition_experiment import (
+        run_unit_experiment,
+    )
+    run_unit_experiment(hardware=True, include_s3=True)
 """
 
 import time

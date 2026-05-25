@@ -1,0 +1,378 @@
+{
+    "metadata": {
+        "date": "2026-05-15",
+        "time": "19:18:22",
+        "total_cases": 6,
+        "num_reads": 500,
+        "solvers": [
+            "ILP",
+            "SQA",
+            "SQA_SF",
+            "SQA_DW"
+        ],
+        "harness_version": "phase5",
+        "num_sweeps": 500
+    },
+    "results": {
+        "unit_n3p5_t30_1": {
+            "source_file": "result_bank/verification_small/cases/unit_n3p5_t30_1.json",
+            "n_nodes": 3,
+            "n_partitions": 5,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 77,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 2.3,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 77,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1185.7,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 99,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 77,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 597.1,
+                    "bqm_variables": 15,
+                    "bqm_interactions": 45,
+                    "lambda_1": 831.0,
+                    "lambda_2": 0.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_DW": {
+                    "cost": 77,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1343.1,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 105,
+                    "lambda_1": 1108.0,
+                    "lambda_2": 92.33333333333333,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "unit_n3p5_t30_2": {
+            "source_file": "result_bank/verification_small/cases/unit_n3p5_t30_2.json",
+            "n_nodes": 3,
+            "n_partitions": 5,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 53,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 2.2,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 53,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1169.3,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 99,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 53,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 585.4,
+                    "bqm_variables": 15,
+                    "bqm_interactions": 45,
+                    "lambda_1": 742.5,
+                    "lambda_2": 0.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_DW": {
+                    "cost": 116,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1312.9,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 105,
+                    "lambda_1": 989.9999999999999,
+                    "lambda_2": 70.71428571428571,
+                    "error": null,
+                    "optimality_gap_absolute": 63,
+                    "optimality_gap_relative": 1.1887
+                }
+            }
+        },
+        "unit_n3p5_t30_3": {
+            "source_file": "result_bank/verification_small/cases/unit_n3p5_t30_3.json",
+            "n_nodes": 3,
+            "n_partitions": 5,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 96,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 2.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 96,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1182.2,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 99,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 96,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 589.2,
+                    "bqm_variables": 15,
+                    "bqm_interactions": 45,
+                    "lambda_1": 649.5,
+                    "lambda_2": 0.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_DW": {
+                    "cost": 117,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1317.3,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 105,
+                    "lambda_1": 866.0,
+                    "lambda_2": 72.16666666666667,
+                    "error": null,
+                    "optimality_gap_absolute": 21,
+                    "optimality_gap_relative": 0.2188
+                }
+            }
+        },
+        "unit_n3p5_t70_1": {
+            "source_file": "result_bank/verification_small/cases/unit_n3p5_t70_1.json",
+            "n_nodes": 3,
+            "n_partitions": 5,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 92,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 2.2,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 92,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1170.6,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 99,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 92,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 585.3,
+                    "bqm_variables": 15,
+                    "bqm_interactions": 45,
+                    "lambda_1": 787.5,
+                    "lambda_2": 0.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_DW": {
+                    "cost": 92,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1324.8,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 105,
+                    "lambda_1": 1050.0,
+                    "lambda_2": 105.0,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "unit_n3p5_t70_2": {
+            "source_file": "result_bank/verification_small/cases/unit_n3p5_t70_2.json",
+            "n_nodes": 3,
+            "n_partitions": 5,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 88,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 2.3,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 88,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1177.3,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 99,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 88,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 587.7,
+                    "bqm_variables": 15,
+                    "bqm_interactions": 45,
+                    "lambda_1": 952.5,
+                    "lambda_2": 0.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_DW": {
+                    "cost": 116,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1319.5,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 105,
+                    "lambda_1": 1270.0,
+                    "lambda_2": 127.0,
+                    "error": null,
+                    "optimality_gap_absolute": 28,
+                    "optimality_gap_relative": 0.3182
+                }
+            }
+        },
+        "unit_n3p5_t70_3": {
+            "source_file": "result_bank/verification_small/cases/unit_n3p5_t70_3.json",
+            "n_nodes": 3,
+            "n_partitions": 5,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 51,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 2.2,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 51,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1166.4,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 99,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 51,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 589.2,
+                    "bqm_variables": 15,
+                    "bqm_interactions": 45,
+                    "lambda_1": 412.5,
+                    "lambda_2": 0.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_DW": {
+                    "cost": 51,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 1322.1,
+                    "bqm_variables": 30,
+                    "bqm_interactions": 105,
+                    "lambda_1": 550.0,
+                    "lambda_2": 55.0,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        }
+    }
+}

@@ -1,158 +1,159 @@
 # Quantum Hardware Solvers
 
-This directory contains QPU versions of the three simulated SQA solvers. Each hardware solver inherits `build_bqm()` from its simulated counterpart unchanged — the QUBO formulation is identical — and overrides only `solve()` to submit the BQM to a real D-Wave quantum annealer via `EmbeddingComposite(DWaveSampler())`.
+This directory contains QPU versions of the three simulated SQA
+solvers.  Each one inherits `build_bqm()` from its simulated parent
+**unchanged** — the QUBO formulation is identical, only the sampler
+changes.  Simulated and hardware results for the same formulation are
+therefore directly comparable.
 
-For details on how each BQM is constructed (variable types, penalty functions, constraint encoding), see [`simulated_solvers/README.md`](../simulated_solvers/README.md).
-
+For details on how each BQM is constructed, see
+[`../simulated_solvers/README.md`](../simulated_solvers/README.md).
 
 ## Prerequisites
 
-1. Install the D-Wave system client:
-   ```
-   pip install dwave-system
-   ```
+```
+pip install -e ".[hardware]"      # installs dwave-system
+dwave setup                       # configure your LEAP API token
+dwave ping                        # verify connectivity
+```
 
-2. Configure your LEAP API token:
-   ```
-   dwave setup
-   ```
-   Alternatively, set the `DWAVE_API_TOKEN` environment variable.
-
-3. Verify connectivity:
-   ```
-   dwave ping
-   ```
-
+The hardware import is deferred inside `_get_hw_registry()` in both
+experiment runners, so the rest of the repo continues to work in
+environments without `dwave-system`.
 
 ## Files
 
-| File | Class | Inherits From | Label |
-|------|-------|---------------|-------|
-| `SQA_HW.py` | `SQAHardwareSolver` | `SQASolver` | S1 Hardware |
-| `SQA_SF_HW.py` | `SQASFHardwareSolver` | `SQASlackFreeSolver` | S2 Hardware |
-| `SQA_DW_HW.py` | `SQADWHardwareSolver` | `SQADomainWallSolver` | S3 Hardware |
-| `__init__.py` | — | — | Package init with convenience imports |
+| File | Class | Inherits from | Label | In default HW registry? |
+|------|-------|---------------|-------|--------------------------|
+| `SQA_HW.py` | `SQAHardwareSolver` | `SQASolver` | S1 HW | yes |
+| `SQA_SF_HW.py` | `SQASFHardwareSolver` | `SQASlackFreeSolver` | S2 HW | yes |
+| `SQA_DW_HW.py` | `SQADWHardwareSolver` | `SQADomainWallSolver` | S3 HW | **no** (opt-in via `include_s3=True`) |
+| `__init__.py` | — | — | — | — |
 
+S3 on hardware is opt-in for the same reason S3 is opt-in everywhere
+else (see `../simulated_solvers/README.md`), with the additional
+hardware concern that the linking constraint inflates chain lengths
+faster than the assignment-only encodings.
 
-## Constructor Parameters
+## Constructor parameters
 
-All three hardware solvers accept the same constructor arguments as their simulated parents, plus one additional parameter:
+All three hardware solvers inherit the constructor of their simulated
+parent.  In particular:
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `nodes` | `dict[str, int]` | — | Node capacities |
-| `partitions` | `dict[str, int]` | — | Partition sizes |
-| `k_safety` | `int` | — | Replication factor |
-| `requests` | `dict[tuple, int]` | — | Request frequencies keyed by `(partition_id, node_id)` |
-| `comm_costs` | `dict[str, int]` | — | Per-partition communication cost |
-| `solver_name` | `str` or `None` | `None` | D-Wave QPU identifier (e.g. `"Advantage_system6.4"`). If `None`, the LEAP client's default QPU is used |
+* `SQAHardwareSolver` takes the same five problem-definition arguments
+  as `SQASolver`.
+* `SQASFHardwareSolver` and `SQADWHardwareSolver` additionally accept
+  `lambda_1` and `lambda_2` (positive floats, or both `None` for
+  auto-calibration).  Calibration on hardware uses the same
+  `dimod.ExactSolver`-based search as the simulated path; it does
+  *not* require a QPU call.
 
-### Pinning a solver
+All three additionally accept:
 
-Specifying `solver_name` ensures reproducibility by targeting a specific QPU. D-Wave periodically recalibrates machines and retires older systems, so results may vary across QPUs or calibration cycles. To list available solvers:
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `solver_name` | `None` | D-Wave QPU identifier (e.g. `"Advantage_system6.4"`).  `None` = LEAP client default. |
 
-```python
-from dwave.system import DWaveSampler
-print(DWaveSampler().properties['chip_id'])
-```
+Pinning a `solver_name` improves reproducibility, since D-Wave
+periodically recalibrates machines and retires older systems.
 
-Or check the LEAP dashboard at https://cloud.dwavesys.com.
+## `solve()` parameters
 
+QPU `solve()` swaps the simulated parameters for hardware ones:
 
-## `solve()` Parameters
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `num_reads` | 100 | Annealing cycles (samples). Each is a real anneal, so the default is much lower than the simulated 1000. |
+| `annealing_time` | 20 | Anneal duration in microseconds (Advantage supports ≈ 0.5–2000 µs). |
+| `chain_strength` | `None` | Coupling strength for physical qubit chains. `None` uses `EmbeddingComposite`'s default heuristic (`uniform_torque_compensation`). |
 
-The `solve()` method replaces the simulated sampler's parameters with QPU-appropriate ones:
+`num_sweeps` and `beta_range` (simulation concepts) do not apply.
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `num_reads` | `int` | 100 | Number of annealing cycles (samples). Each read is a physical anneal on the QPU. Lower default than the simulated solvers (1000) because hardware reads are real quantum anneals, not Monte Carlo sweeps |
-| `annealing_time` | `int` | 20 | Anneal duration in microseconds. Advantage systems support roughly 0.5–2000 µs. Longer anneals allow the system more time to find the ground state but consume more QPU time |
-| `chain_strength` | `float` or `None` | `None` | Coupling strength for physical qubit chains (see below). If `None`, `EmbeddingComposite` applies its default heuristic (`uniform_torque_compensation`) |
+## Chain strength tuning
 
-### Parameters not carried over from simulated solvers
+When `EmbeddingComposite` maps logical variables to physical qubits, a
+single logical variable can require multiple physical qubits coupled
+ferromagnetically into a "chain".  `chain_strength` controls how
+strongly they're coupled:
 
-- **`num_sweeps`** — a simulation concept (Monte Carlo sweeps per read). Does not apply to hardware.
-- **`beta_range`** — the inverse temperature schedule for Path Integral Monte Carlo. On hardware, the anneal schedule is controlled by `annealing_time` and the QPU's built-in anneal schedule.
+* **Too weak**: chains break during annealing → high
+  `chain_break_fraction` in the results, invalid logical states.
+* **Too strong**: chain couplings dominate the energy landscape →
+  problem signal is washed out, validity collapses anyway.
 
-
-## Chain Strength
-
-When `EmbeddingComposite` maps logical variables to physical qubits, a single logical variable often requires multiple physical qubits coupled together in a "chain" via strong ferromagnetic interactions. The `chain_strength` parameter controls the magnitude of these couplings.
-
-- **Too weak:** chains break during annealing, producing invalid logical states. Manifests as high `chain_break_fraction` in the results.
-- **Too strong:** chain couplings dominate the problem's energy landscape, washing out the signal from the actual objective and constraint terms. The QPU effectively "sees" mostly chain couplings rather than your problem.
-
-The default heuristic works reasonably well for many problems. For these solvers, where penalty weights `h` and `h_k` can be large, a good manual starting point is:
+A reasonable manual starting point:
 
 ```python
 chain_strength = 0.8 * max(abs(v) for v in bqm.quadratic.values())
 ```
 
-If you observe high chain break fractions (> 0.1), increase chain strength. If validity rates are poor despite low chain breaks, the chain strength may be too high — try reducing it.
-
+S2's calibrated `λ₂` can be very small (≪ 1) on some instances while
+its quadratic couplings on `A_{p,n}` pairs are `2·λ₂·size_p·size_p'`.
+On hardware this is fine — chain strength dominates the smaller of the
+two — but if you observe high chain breaks specifically on S2,
+inspecting `solver.lambda_1` / `solver.lambda_2` is a useful first
+diagnostic.
 
 ## `hardware_summary()`
 
-Each solver provides a `hardware_summary()` method that returns a dict of QPU execution metadata after `solve()` has been called:
+After `solve()`, returns a dict of QPU execution metadata:
 
-| Key | Type | Description |
-|-----|------|-------------|
-| `wall_time_ms` | `float` | Total wall-clock time including network latency, embedding, QPU access, and readout |
-| `qpu_access_time_us` | `int` | Total time the job occupied the QPU, in microseconds |
-| `qpu_anneal_time_per_sample_us` | `int` | Anneal duration per sample in microseconds (should match `annealing_time`) |
-| `physical_qubits` | `int` | Total physical qubits used after embedding (sum of all chain lengths) |
-| `logical_variables` | `int` | Number of logical variables in the BQM |
-| `chain_break_fraction` | `float` | Mean fraction of samples containing at least one broken chain (0.0 = no breaks) |
-| `num_reads` | `int` | Number of samples returned |
+| Key | Description |
+|-----|-------------|
+| `wall_time_ms` | Total wall time including network + queue + readout |
+| `qpu_access_time_us` | Total time the job spent on the QPU |
+| `qpu_anneal_time_per_sample_us` | Anneal duration per sample (should match `annealing_time`) |
+| `physical_qubits` | Sum of chain lengths across all logical variables |
+| `logical_variables` | BQM variable count |
+| `chain_break_fraction` | Mean fraction of samples with at least one broken chain |
+| `num_reads` | Number of samples returned |
 
-### Timing breakdown
+For scientific comparisons of hardware vs simulated performance, use
+`qpu_access_time_us` (or the per-stage breakdown in `solver.qpu_timing`)
+— wall-clock time on hardware is dominated by network latency and
+queue wait, not computation.
 
-Wall-clock time on hardware is dominated by network latency and QPU queue wait, not computation. For scientific comparison, use `qpu_access_time_us` (or the full `self.qpu_timing` dict which contains a detailed breakdown including programming time, sampling time, and readout time). The complete timing dict is accessible via `solver.qpu_timing` after calling `solve()`.
+## Additional instance attributes
 
+After `solve()`, each hardware solver populates:
 
-## Additional Instance Attributes
+| Attribute | Description |
+|-----------|-------------|
+| `self.result` | Best sample (lowest energy) |
+| `self.sampleset` | Full `dimod.SampleSet` with all reads |
+| `self.embedding` | Logical → physical qubit mapping |
+| `self.qpu_timing` | Full timing breakdown |
+| `self.chain_break_fraction` | Mean chain break fraction |
+| `self.physical_qubits` | Total physical qubits consumed |
+| `self.lambda_1`, `self.lambda_2` | Calibrated lambdas (S2 HW, S3 HW only) |
 
-After calling `solve()`, each hardware solver populates:
-
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `self.result` | `dimod.SampleView` | Best sample (lowest energy). Same format as simulated solvers — compatible with `calculate_solution_cost()` and `is_valid_solution()` |
-| `self.sampleset` | `dimod.SampleSet` | Full sample set with all reads, energies, and metadata |
-| `self.embedding` | `dict` | The minor embedding used: maps logical variable names to lists of physical qubit indices |
-| `self.qpu_timing` | `dict` | Full QPU timing breakdown from `sampleset.info['timing']` |
-| `self.chain_break_fraction` | `float` | Mean chain break fraction across all samples |
-| `self.physical_qubits` | `int` | Total physical qubits consumed |
-
-
-## Usage Example
+## Usage example
 
 ```python
 from solvers.quantum_hardware_solvers import SQASFHardwareSolver
 from util.test_generation.json_to_dict import json_to_test_case
 from util.calculate_solution_cost import calculate_solution_cost, is_valid_solution
 
-# Load a test case
-nodes, partitions, k_safety, requests, comm_costs = json_to_test_case("test_bank/unit_partition/tier1/n-3_p-3_1.json")
+nodes, partitions, k_safety, requests, comm_costs = json_to_test_case(
+    "test_bank/unit_partition/tier1/n3_p4/n-3_p-4_1.json"
+)
 
-# Solve on hardware
 solver = SQASFHardwareSolver(nodes, partitions, k_safety, requests, comm_costs)
 time_ms, result = solver.solve(num_reads=200, annealing_time=50)
 
-# Evaluate
 cost = calculate_solution_cost(nodes, partitions, k_safety, requests, comm_costs, result)
 valid = is_valid_solution(nodes, partitions, k_safety, requests, comm_costs, result)
 
 print(f"Cost: {cost}, Valid: {valid}")
+print(f"Calibrated lambdas: {solver.lambda_1}, {solver.lambda_2}")
 print(solver.hardware_summary())
 ```
 
+## Formulation restrictions
 
-## Formulation Restrictions
-
-The same restrictions that apply to the simulated solvers apply here:
-
-| Solver | Capacity Restriction | Partition Size Restriction |
-|--------|---------------------|--------------------------|
-| S1 (`SQAHardwareSolver`) | Mersenne numbers only (2^k − 1) | Any |
-| S2 (`SQASFHardwareSolver`) | Any positive integer | Must all equal 1 |
-| S3 (`SQADWHardwareSolver`) | Any positive integer | Must all equal 1 |
+After Phases 1–3 there are no per-solver capacity or partition-size
+restrictions: all three solvers accept arbitrary non-negative integer
+capacities and partition sizes.  See
+[`../simulated_solvers/README.md`](../simulated_solvers/README.md) for
+the encoding-specific caveats (e.g. S2's calibrated lambdas; S3's
+near-optimum-only guarantee on tight instances).

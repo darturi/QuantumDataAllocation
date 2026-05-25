@@ -1,0 +1,432 @@
+{
+    "metadata": {
+        "date": "2026-05-15",
+        "time": "16:54:13",
+        "total_cases": 1600,
+        "num_reads": 1000,
+        "solvers": [
+            "ILP",
+            "SQA",
+            "SQA_SF"
+        ],
+        "harness_version": "phase5",
+        "num_sweeps": 1000,
+        "note": "Unit-partition benchmark: test_bank cases drawn with size_p = 1.  All solvers in the default registry also support arbitrary sizes -- see the arbitrary-partition runner."
+    },
+    "results": {
+        "n-2_p-12_1": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_1.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 36.8,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 15822.3,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9635.3,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 1152.0,
+                    "lambda_2": 38.4,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "n-2_p-12_10": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_10.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 20.4,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 15974.1,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9610.8,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 1558.0,
+                    "lambda_2": 51.93333333333333,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "n-2_p-12_2": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_2.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 23.4,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 15989.6,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9681.7,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 1392.0,
+                    "lambda_2": 46.4,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "n-2_p-12_3": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_3.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 21.7,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 16108.6,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9800.3,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 1558.0,
+                    "lambda_2": 51.93333333333333,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "n-2_p-12_4": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_4.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 22.9,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 16139.2,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9640.1,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 846.0,
+                    "lambda_2": 28.2,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "n-2_p-12_5": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_5.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 21.7,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": false,
+                    "k_safety_violations": 1,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 15951.9,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9636.8,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 1518.0,
+                    "lambda_2": 50.6,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "n-2_p-12_6": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_6.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 21.7,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 15988.4,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9576.4,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 1236.0,
+                    "lambda_2": 41.2,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "n-2_p-12_7": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_7.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 23.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 15788.3,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9547.5,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 1324.0,
+                    "lambda_2": 44.13333333333333,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        },
+        "n-2_p-12_8": {
+            "source_file": "/Users/danielarturi/Desktop/Quantum/QuantumClean/test_bank/unit_partition/tier1/n2_p12/n-2_p-12_8.json",
+            "n_nodes": 2,
+            "n_partitions": 12,
+            "k_safety": 2,
+            "solvers": {
+                "ILP": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 63.5,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 15793.9,
+                    "bqm_variables": 32,
+                    "bqm_interactions": 252,
+                    "lambda_1": null,
+                    "lambda_2": null,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 0,
+                    "valid": true,
+                    "k_safety_violations": 0,
+                    "capacity_overruns": 0,
+                    "wall_time_ms": 9569.3,
+                    "bqm_variables": 24,
+                    "bqm_interactions": 144,
+                    "lambda_1": 1322.0,
+                    "lambda_2": 44.06666666666667,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                }
+            }
+        }
+    }
+}

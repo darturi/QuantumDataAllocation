@@ -1,14 +1,22 @@
 """
-S2 Hardware — QPU version of the Slack-Free SQA solver.
+S2 Hardware -- QPU version of the Slack-Free SQA solver.
 
-Reuses the BQM construction from SQASlackFreeSolver (unbalanced penalty
-for storage, no slack variables) and submits it to a real D-Wave QPU.
+Reuses the BQM construction from SQASlackFreeSolver (calibrated
+unbalanced penalisation, no slack variables) and submits it to a real
+D-Wave QPU.
 
-Key advantage over S1 on hardware: fewer logical variables (no slack
-variables), which means a smaller embedding and fewer physical qubits.
+Headline advantage over S1 on hardware: fewer logical variables (no
+slack variables), so the embedding is smaller and fewer physical qubits
+are consumed.  After Phase-2, the partition-size restriction that used
+to apply to S2 is gone -- the unbalanced penalty's coefficients now
+include ``size_p`` explicitly, so arbitrary integer partition sizes are
+supported.
 
-Restrictions:
-    - All partition sizes must equal 1 (same as simulated S2).
+Lambda calibration is the same as the simulated S2 path: pass explicit
+``lambda_1`` / ``lambda_2``, or pass neither and let the constructor
+auto-calibrate via ``dimod.ExactSolver`` (small instances) or the
+heuristic fallback (large instances).  Calibration runs locally and
+does *not* require a QPU call.
 
 Usage:
     solver = SQASFHardwareSolver(nodes, partitions, k_safety, requests, comm_costs)

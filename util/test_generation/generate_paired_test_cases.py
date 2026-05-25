@@ -1,15 +1,19 @@
 """
-Generate **paired** test cases: for each random seed, produce both a
-variable-size test case (for S0) and a unit-partition test case (for S1–S3).
+Generate **paired** test cases: for each random seed, produce one
+arbitrary-partition test case (for S1) and one unit-partition test
+case (for S1 + S2), where the two share request frequencies and
+communication costs.
 
-The two test cases share the same node count, partition count, request
-frequencies, and communication costs — only partition sizes and node
-capacities differ.  This controls for all other variables and isolates the
-effect of the formulation change.
+This controls for those parameters and isolates the effect of the
+partition-size change alone -- useful for ablation experiments that
+compare S1's slack-variable encoding under uniform vs variable sizes.
+
+After Phase 4, both generators use the ``tightness`` parameter
+(``0.0`` loose .. ``1.0`` tight) and verify feasibility with an ILP
+probe.  The previous ``capacity_factor`` argument is gone.
 """
 
 import json
-import random
 from pathlib import Path
 
 from util.test_generation.generate_test_case import generate_test_case
@@ -24,31 +28,24 @@ def generate_paired_test_case(
     size_range=(5, 20),
     req_range=(0, 10),
     cost_range=(1, 10),
-    capacity_factor=1.5,
-    unit_capacity_factor=1.3,
+    arbitrary_tightness=0.5,
+    unit_tightness=0.7,
 ):
     """
-    Generate a matched pair of test cases (variable-size and unit-partition).
+    Generate a matched pair (variable-size, unit-partition).
 
-    Both test cases use the same random seed for request frequencies and
-    communication costs so those parameters are identical.  Partition sizes
-    and node capacities are formulation-specific.
+    Both test cases use the same RNG seed for request frequencies and
+    communication costs, so those parameters are identical.  Partition
+    sizes and node capacities are formulation-specific.
 
-    Args:
-        n_nodes:              number of storage nodes
-        n_partitions:         number of data partitions
-        k_safety:             replication factor
-        seed:                 random seed (None = non-deterministic)
-        size_range:           (min, max) partition sizes for the variable-size case
-        req_range:            (min, max) request frequencies
-        cost_range:           (min, max) communication costs
-        capacity_factor:      capacity multiplier for variable-size case
-        unit_capacity_factor: capacity multiplier for unit-partition case
+    Tightness is exposed as two separate parameters because the
+    arbitrary-partition case can be intrinsically infeasible at very
+    high tightness (bin-packing); a sensible default is to use a
+    slightly looser arbitrary case than unit case.
 
     Returns:
-        (variable_tc, unit_tc) — two dicts in standard test case format.
+        (var_tc, unit_tc) -- two dicts in standard test-case JSON format.
     """
-    # Generate variable-size test case
     var_tc = generate_test_case(
         n_nodes, n_partitions,
         k_safety=k_safety,
@@ -56,23 +53,22 @@ def generate_paired_test_case(
         size_range=size_range,
         req_range=req_range,
         cost_range=cost_range,
-        capacity_factor=capacity_factor,
+        tightness=arbitrary_tightness,
     )
 
-    # Generate unit test case with the same seed so requests/costs match
     unit_tc = generate_unit_test_case(
         n_nodes, n_partitions,
         k_safety=k_safety,
         seed=seed,
         req_range=req_range,
         cost_range=cost_range,
-        capacity_factor=unit_capacity_factor,
+        tightness=unit_tightness,
     )
 
-    # Overwrite unit_tc requests and comm_costs with the variable_tc values
-    # to guarantee they are identical (the generators use the seed in the
-    # same order for requests/costs, but sizes consume RNG calls first in
-    # the variable case, shifting the sequence).
+    # Overwrite unit_tc's requests/comm_costs with the variable_tc values.
+    # The two generators draw partition sizes first, which shifts the
+    # RNG state by different amounts for the two cases; copying the
+    # values directly guarantees the pair shares those exact inputs.
     unit_tc["requests"] = var_tc["requests"]
     unit_tc["comm_costs"] = var_tc["comm_costs"]
 
@@ -91,19 +87,13 @@ def generate_paired_batch(
     """
     Generate ``count`` paired test cases and save them as JSON files.
 
-    For each index *i*, two files are written:
+    For each index ``i`` two files are written:
 
-    * ``n-{n}_p-{p}_{i}_var.json``   — variable-size test case
-    * ``n-{n}_p-{p}_{i}_unit.json``  — unit-partition test case
-
-    Args:
-        n_nodes, n_partitions, count, k_safety, base_seed:
-            Same as generate_paired_test_case.
-        output_dir: destination directory (str or Path)
-        **kwargs:   forwarded to generate_paired_test_case
+        n-{n}_p-{p}_{i}_var.json    -- variable-size test case
+        n-{n}_p-{p}_{i}_unit.json   -- unit-partition test case
 
     Returns:
-        list[tuple[Path, Path]]: (var_path, unit_path) for each pair.
+        list[tuple[Path, Path]] -- (var_path, unit_path) per pair.
     """
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)

@@ -13,8 +13,12 @@ Usage:
 
 Requirements:
     - dwave-system  (pip install dwave-system)
-    - Valid LEAP API token configured via `dwave setup` or DWAVE_API_TOKEN env var
-    - Capacities must be Mersenne numbers (same restriction as simulated S1)
+    - Valid LEAP API token configured via ``dwave setup`` or DWAVE_API_TOKEN env var
+
+After the Phase-1 fix, S1 supports arbitrary integer capacities -- the
+slack-chunk decomposition was generalised from the Mersenne-only binary
+expansion to ``[1, 2, 4, ..., 2^J, residual]`` so that the chunks sum
+to exactly ``C_n``.  The hardware solver inherits this fix unchanged.
 """
 
 import time

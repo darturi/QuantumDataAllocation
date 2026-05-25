@@ -1,17 +1,21 @@
 """
-Core experiment harness for QuantumClean.
+Core experiment harness for QuantumClean (revised in Phase 5).
 
 Loads pre-generated test cases from disk, runs every registered solver on
-each case, computes cost / validity / BQM statistics / optimality gap vs
-ILP, and writes results incrementally to a JSON file.
+each case, computes cost / validity / BQM stats / optimality gap, and writes
+results incrementally to a JSON file.
 
-This module provides the engine; the thin wrapper scripts
-(run_unit_partition_experiment.py, run_arbitrary_partition_experiment.py)
-supply the test-case paths and solver registrations.
+Phase 5 changes vs. the old harness:
 
-Result format matches the QuantumPersonal SweepV2 / UnitSweep JSON
-structure so downstream result_analysis can work uniformly across old and new
-results.
+* ``optimality_gap`` is reported as both absolute (``cost_optimal - ilp_cost``)
+  and relative (with sensible behaviour when ``ilp_cost == 0``: relative is
+  0.0 iff the solver also returned 0, ``None`` otherwise).
+* Result entries include ``k_safety_violations`` and ``capacity_overruns``
+  so "invalid" results carry signal instead of a single boolean.
+* ``time_ms`` is split into ``wall_time_ms`` (always present) and
+  ``qpu_anneal_time_per_sample_us`` / ``ilp_branch_nodes`` (where
+  applicable).  Plotting these side-by-side is the *caller's* responsibility.
+* ``_NumpyEncoder`` is used on every JSON write.
 """
 
 import json
@@ -26,15 +30,13 @@ from util.calculate_solution_cost import (
     calculate_solution_cost,
     is_valid_solution,
 )
-from util.test_generation.json_to_dict import json_to_test_case
+from util.test_generation.json_to_dict import (
+    json_to_test_case,
+    load_test_case_metadata,
+)
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 class _NumpyEncoder(json.JSONEncoder):
-    """Encode numpy scalars so json.dump doesn't choke on them."""
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -45,21 +47,67 @@ class _NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
+def _write_json(path, payload):
+    with open(path, "w") as f:
+        json.dump(payload, f, indent=4, cls=_NumpyEncoder)
+
+
+# ---------------------------------------------------------------------------
+# Constraint diagnostics
+# ---------------------------------------------------------------------------
+
+def _violations(nodes, partitions, k_safety, sample_dict):
+    """Return (k_safety_violations, capacity_overruns) for a flat A_p_n dict."""
+    if sample_dict is None:
+        return None, None
+    k_viol = 0
+    for p in partitions:
+        cnt = sum(int(sample_dict.get(f"A_{p}_{n}", 0)) for n in nodes)
+        if cnt != k_safety:
+            k_viol += 1
+    overruns = 0
+    for n, cap in nodes.items():
+        load = sum(
+            int(sample_dict.get(f"A_{p}_{n}", 0)) * partitions[p]
+            for p in partitions
+        )
+        if load > cap:
+            overruns += 1
+    return k_viol, overruns
+
+
+def _to_flat(sample_obj):
+    if sample_obj is None:
+        return None
+    return sample_obj.sample if hasattr(sample_obj, "sample") else sample_obj
+
+
+def _gap(cost, ilp_cost):
+    """
+    Return (absolute_gap, relative_gap).
+
+    * absolute is always defined when both are defined.
+    * relative is 0.0 if both are 0, (cost - ilp)/ilp if ilp > 0,
+      else None (we don't divide by 0 silently).
+    """
+    if cost is None or ilp_cost is None:
+        return None, None
+    abs_gap = cost - ilp_cost
+    if ilp_cost > 0:
+        rel = round(abs_gap / ilp_cost, 4)
+    elif cost == 0:
+        rel = 0.0
+    else:
+        rel = None
+    return abs_gap, rel
+
+
+# ---------------------------------------------------------------------------
+# Test-case discovery (unchanged from the previous version)
+# ---------------------------------------------------------------------------
+
 def discover_test_cases(test_bank_dir, tier=None, node_counts=None,
                         partition_counts=None, max_cases=None):
-    """
-    Discover JSON test case files under *test_bank_dir*.
-
-    Args:
-        test_bank_dir:    root directory to search (e.g. test_bank/unit_partition)
-        tier:             optional "tier1" or "tier2" filter
-        node_counts:      optional list of node counts to include (e.g. [2, 3, 5])
-        partition_counts: optional list of partition counts to include
-        max_cases:        cap the total number of test cases returned
-
-    Returns:
-        Sorted list of Path objects.
-    """
     test_bank_dir = Path(test_bank_dir)
     search_root = test_bank_dir / tier if tier else test_bank_dir
     paths = sorted(search_root.rglob("*.json"))
@@ -67,8 +115,7 @@ def discover_test_cases(test_bank_dir, tier=None, node_counts=None,
     if node_counts is not None or partition_counts is not None:
         filtered = []
         for p in paths:
-            # Directory names are like n5_p18
-            m = re.match(r'n(\d+)_p(\d+)', p.parent.name)
+            m = re.match(r"n(\d+)_p(\d+)", p.parent.name)
             if not m:
                 continue
             n, pp = int(m.group(1)), int(m.group(2))
@@ -85,135 +132,135 @@ def discover_test_cases(test_bank_dir, tier=None, node_counts=None,
     return paths
 
 
-def _flatten_ilp_result(ilp_result, partitions, nodes):
-    """
-    Convert ILP's nested {p: {n: 0|1}} result dict into the flat
-    {'A_p1_n1': 0, ...} format that calculate_solution_cost expects.
-    """
-    if ilp_result is None:
-        return None
-    return {
-        f'A_{p}_{n}': v
-        for p, nd in ilp_result.items()
-        for n, v in nd.items()
-    }
-
+# ---------------------------------------------------------------------------
+# Per-solver execution
+# ---------------------------------------------------------------------------
 
 def _run_ilp(solver_class, nodes, partitions, k_safety, requests, comm_costs):
-    """Run ILP solver, return result dict in the standard format."""
     try:
         solver = solver_class(nodes, partitions, k_safety, requests, comm_costs)
         t_ms, raw_result = solver.solve()
-
-        flat = _flatten_ilp_result(raw_result, partitions, nodes)
+        flat = None
+        if raw_result is not None:
+            flat = {
+                f"A_{p}_{n}": v
+                for p, nd in raw_result.items() for n, v in nd.items()
+            }
         cost = calculate_solution_cost(
             nodes, partitions, k_safety, requests, comm_costs, flat
         )
         valid = is_valid_solution(
             nodes, partitions, k_safety, requests, comm_costs, flat
         )
-
+        k_viol, overruns = _violations(nodes, partitions, k_safety, flat)
         return {
             "cost": cost,
             "valid": valid,
-            "time_ms": round(t_ms, 1) if t_ms is not None else None,
+            "k_safety_violations": k_viol,
+            "capacity_overruns": overruns,
+            "wall_time_ms": round(t_ms, 1) if t_ms is not None else None,
             "error": None,
         }
     except Exception as e:
         return {
-            "cost": None,
-            "valid": False,
-            "time_ms": None,
-            "error": str(e),
+            "cost": None, "valid": False,
+            "k_safety_violations": None, "capacity_overruns": None,
+            "wall_time_ms": None, "error": str(e),
         }
 
 
 def _run_sqa(solver_class, nodes, partitions, k_safety, requests, comm_costs,
-             num_reads, num_sweeps, beta_range):
-    """Run an SQA-family solver, return result dict in the standard format."""
+             num_reads, num_sweeps, beta_range, solver_kwargs=None):
     try:
-        solver = solver_class(nodes, partitions, k_safety, requests, comm_costs)
+        solver_kwargs = solver_kwargs or {}
+        solver = solver_class(nodes, partitions, k_safety, requests, comm_costs,
+                              **solver_kwargs)
         bqm = solver.build_bqm()
         bqm_vars = len(bqm.variables)
         bqm_interactions = len(bqm.quadratic)
 
-        solve_kwargs = dict(num_reads=num_reads, num_sweeps=num_sweeps)
+        kw = dict(num_reads=num_reads, num_sweeps=num_sweeps)
         if beta_range is not None:
-            solve_kwargs["beta_range"] = beta_range
+            kw["beta_range"] = beta_range
 
-        t_ms, result = solver.solve(**solve_kwargs)
-
+        t_ms, result = solver.solve(**kw)
+        flat = _to_flat(result)
         cost = calculate_solution_cost(
-            nodes, partitions, k_safety, requests, comm_costs, result
+            nodes, partitions, k_safety, requests, comm_costs, flat
         )
         valid = is_valid_solution(
-            nodes, partitions, k_safety, requests, comm_costs, result
+            nodes, partitions, k_safety, requests, comm_costs, flat
         )
-
+        k_viol, overruns = _violations(nodes, partitions, k_safety, flat)
         return {
             "cost": cost,
             "valid": valid,
-            "time_ms": round(t_ms, 1),
+            "k_safety_violations": k_viol,
+            "capacity_overruns": overruns,
+            "wall_time_ms": round(t_ms, 1),
             "bqm_variables": bqm_vars,
             "bqm_interactions": bqm_interactions,
+            "lambda_1": getattr(solver, "lambda_1", None),
+            "lambda_2": getattr(solver, "lambda_2", None),
             "error": None,
         }
     except Exception as e:
         return {
-            "cost": None,
-            "valid": False,
-            "time_ms": None,
-            "bqm_variables": None,
-            "bqm_interactions": None,
+            "cost": None, "valid": False,
+            "k_safety_violations": None, "capacity_overruns": None,
+            "wall_time_ms": None,
+            "bqm_variables": None, "bqm_interactions": None,
+            "lambda_1": None, "lambda_2": None,
             "error": str(e),
         }
 
 
 def _run_qpu(solver_class, nodes, partitions, k_safety, requests, comm_costs,
-             num_reads, annealing_time, chain_strength):
-    """Run a QPU hardware solver, return result dict with hardware metadata."""
+             num_reads, annealing_time, chain_strength, solver_kwargs=None):
     try:
-        solver = solver_class(nodes, partitions, k_safety, requests, comm_costs)
+        solver_kwargs = solver_kwargs or {}
+        solver = solver_class(nodes, partitions, k_safety, requests, comm_costs,
+                              **solver_kwargs)
         bqm = solver.build_bqm()
         bqm_vars = len(bqm.variables)
         bqm_interactions = len(bqm.quadratic)
 
-        solve_kwargs = dict(num_reads=num_reads, annealing_time=annealing_time)
+        kw = dict(num_reads=num_reads, annealing_time=annealing_time)
         if chain_strength is not None:
-            solve_kwargs["chain_strength"] = chain_strength
+            kw["chain_strength"] = chain_strength
 
-        t_ms, result = solver.solve(**solve_kwargs)
-
+        t_ms, result = solver.solve(**kw)
+        flat = _to_flat(result)
         cost = calculate_solution_cost(
-            nodes, partitions, k_safety, requests, comm_costs, result
+            nodes, partitions, k_safety, requests, comm_costs, flat
         )
         valid = is_valid_solution(
-            nodes, partitions, k_safety, requests, comm_costs, result
+            nodes, partitions, k_safety, requests, comm_costs, flat
         )
-
+        k_viol, overruns = _violations(nodes, partitions, k_safety, flat)
         hw = solver.hardware_summary()
-
         return {
-            "cost": cost,
-            "valid": valid,
-            "time_ms": round(t_ms, 1),
+            "cost": cost, "valid": valid,
+            "k_safety_violations": k_viol, "capacity_overruns": overruns,
+            "wall_time_ms": round(t_ms, 1),
             "bqm_variables": bqm_vars,
             "bqm_interactions": bqm_interactions,
             "physical_qubits": hw.get("physical_qubits"),
             "chain_break_fraction": hw.get("chain_break_fraction"),
-            "qpu_access_time_us": hw.get("qpu_access_time_us"),
+            "qpu_anneal_time_per_sample_us": hw.get("qpu_anneal_time_per_sample_us"),
+            "lambda_1": getattr(solver, "lambda_1", None),
+            "lambda_2": getattr(solver, "lambda_2", None),
             "error": None,
         }
     except Exception as e:
         return {
-            "cost": None,
-            "valid": False,
-            "time_ms": None,
-            "bqm_variables": None,
-            "bqm_interactions": None,
-            "physical_qubits": None,
-            "chain_break_fraction": None,
-            "qpu_access_time_us": None,
+            "cost": None, "valid": False,
+            "k_safety_violations": None, "capacity_overruns": None,
+            "wall_time_ms": None,
+            "bqm_variables": None, "bqm_interactions": None,
+            "physical_qubits": None, "chain_break_fraction": None,
+            "qpu_anneal_time_per_sample_us": None,
+            "lambda_1": None, "lambda_2": None,
             "error": str(e),
         }
 
@@ -233,41 +280,17 @@ def run_experiment(
     annealing_time=20,
     chain_strength=None,
     note=None,
+    verbose=True,
 ):
-    """
-    Run a full experiment: every solver on every test case.
-
-    Args:
-        test_case_paths: list of Path objects pointing to JSON test cases.
-        solver_registry: list of solver descriptors, each a dict:
-            {
-                "name":  str,               # e.g. "ILP", "SQA", "SQA_HW"
-                "class": class,             # solver class
-                "type":  "ilp"|"sqa"|"qpu", # determines how we invoke it
-            }
-        output_dir:      directory for the result JSON file.
-        file_prefix:     prefix for the auto-numbered output filename.
-        num_reads:       num_reads for SQA and QPU solvers (ignored for ILP).
-        num_sweeps:      SQA num_sweeps (ignored for ILP and QPU solvers).
-        beta_range:      SQA beta_range (ignored for ILP and QPU solvers).
-        annealing_time:  QPU anneal duration in microseconds (ignored for
-                         ILP and simulated SQA solvers).  Default 20.
-        chain_strength:  QPU chain strength (ignored for ILP and simulated
-                         SQA solvers).  None = sampler default heuristic.
-        note:            optional string added to metadata.
-
-    Returns:
-        Path to the created results file.
-    """
+    """Run every solver on every test case."""
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Auto-increment file number
     existing = output_dir.glob(f"{file_prefix}_*.json")
     numbers = [
         int(m.group(1))
         for f in existing
-        if (m := re.search(rf'{file_prefix}_(\d+)\.json', f.name))
+        if (m := re.search(rf"{file_prefix}_(\d+)\.json", f.name))
     ]
     file_num = max(numbers, default=0) + 1
     output_path = output_dir / f"{file_prefix}_{file_num}.json"
@@ -277,11 +300,12 @@ def run_experiment(
     has_qpu = any(s["type"] == "qpu" for s in solver_registry)
 
     metadata = {
-        "date":            date.today().isoformat(),
-        "time":            datetime.now().strftime("%H:%M:%S"),
-        "total_cases":     len(test_case_paths),
-        "num_reads":       num_reads,
-        "solvers":         solver_names,
+        "date": date.today().isoformat(),
+        "time": datetime.now().strftime("%H:%M:%S"),
+        "total_cases": len(test_case_paths),
+        "num_reads": num_reads,
+        "solvers": solver_names,
+        "harness_version": "phase5",
     }
     if has_sqa:
         metadata["num_sweeps"] = num_sweeps
@@ -293,104 +317,88 @@ def run_experiment(
     output = {"metadata": metadata, "results": {}}
     if note:
         output["metadata"]["note"] = note
-
-    # Write initial metadata
-    with open(output_path, "w") as f:
-        json.dump(output, f, indent=4, cls=_NumpyEncoder)
+    _write_json(output_path, output)
 
     total = len(test_case_paths)
     sweep_start = time.perf_counter()
 
     for idx, tc_path in enumerate(test_case_paths, 1):
         tc_path = Path(tc_path)
-        key = tc_path.stem  # e.g. "n-3_p-8_1"
+        key = tc_path.stem
 
         nodes, partitions, k_safety, requests, comm_costs = json_to_test_case(
             str(tc_path)
         )
+        tc_metadata = load_test_case_metadata(str(tc_path))
 
         entry = {
-            "source_file": str(tc_path.relative_to(tc_path.parents[3])),
+            "source_file": str(tc_path),
             "n_nodes": len(nodes),
             "n_partitions": len(partitions),
             "k_safety": k_safety,
+            # Phase-5 + tightness extension: surface test-case metadata
+            # (notably ``tightness``) so downstream analysis can stratify
+            # results without re-reading the source JSON.  Each metadata
+            # field becomes a top-level key on the entry, prefixed with
+            # ``tc_`` to avoid colliding with solver-result keys.
+            **{f"tc_{k}": v for k, v in tc_metadata.items()},
             "solvers": {},
         }
 
-        # --- Run each solver ---
         ilp_cost = None
 
         for solver_desc in solver_registry:
             name = solver_desc["name"]
             cls = solver_desc["class"]
             solver_type = solver_desc["type"]
+            solver_kwargs = solver_desc.get("kwargs", {})
 
             if solver_type == "ilp":
-                result = _run_ilp(
-                    cls, nodes, partitions, k_safety, requests, comm_costs
-                )
+                result = _run_ilp(cls, nodes, partitions, k_safety, requests, comm_costs)
                 if result["valid"] and result["cost"] is not None:
                     ilp_cost = result["cost"]
             elif solver_type == "sqa":
                 result = _run_sqa(
                     cls, nodes, partitions, k_safety, requests, comm_costs,
-                    num_reads=num_reads,
-                    num_sweeps=num_sweeps,
-                    beta_range=beta_range,
+                    num_reads, num_sweeps, beta_range, solver_kwargs,
                 )
-                # Compute optimality gap vs ILP
-                if (ilp_cost is not None and ilp_cost > 0
-                        and result["valid"]
-                        and result["cost"] is not None):
-                    result["optimality_gap"] = round(
-                        (result["cost"] - ilp_cost) / ilp_cost, 4
-                    )
-                else:
-                    result["optimality_gap"] = None
             elif solver_type == "qpu":
                 result = _run_qpu(
                     cls, nodes, partitions, k_safety, requests, comm_costs,
-                    num_reads=num_reads,
-                    annealing_time=annealing_time,
-                    chain_strength=chain_strength,
+                    num_reads, annealing_time, chain_strength, solver_kwargs,
                 )
-                # Compute optimality gap vs ILP
-                if (ilp_cost is not None and ilp_cost > 0
-                        and result["valid"]
-                        and result["cost"] is not None):
-                    result["optimality_gap"] = round(
-                        (result["cost"] - ilp_cost) / ilp_cost, 4
-                    )
-                else:
-                    result["optimality_gap"] = None
             else:
                 raise ValueError(f"Unknown solver type: {solver_type!r}")
 
+            abs_gap, rel_gap = _gap(result.get("cost"), ilp_cost)
+            result["optimality_gap_absolute"] = abs_gap
+            result["optimality_gap_relative"] = rel_gap
             entry["solvers"][name] = result
 
         output["results"][key] = entry
+        _write_json(output_path, output)
 
-        # Incremental save
-        with open(output_path, "w") as f:
-            json.dump(output, f, indent=4, cls=_NumpyEncoder)
-
-        # Progress
-        elapsed = time.perf_counter() - sweep_start
-        rate = idx / elapsed if elapsed > 0 else 0
-        eta = (total - idx) / rate if rate > 0 else 0
-        eta_min = int(eta // 60)
-        eta_sec = int(eta % 60)
-
-        solver_status = "  ".join(
-            f"{s['name']}={'OK' if entry['solvers'][s['name']].get('valid') else 'X'}"
-            for s in solver_registry
-        )
-        print(
-            f"  [{idx}/{total}] {key}: {solver_status}"
-            f"  [ETA {eta_min}m{eta_sec:02d}s]"
-        )
+        if verbose:
+            elapsed = time.perf_counter() - sweep_start
+            rate = idx / elapsed if elapsed > 0 else 0
+            eta_total = (total - idx) / rate if rate > 0 else 0
+            eta_min = int(eta_total // 60)
+            eta_sec = int(eta_total % 60)
+            status_parts = []
+            for s in solver_registry:
+                r = entry["solvers"][s["name"]]
+                tag = "OK" if r.get("valid") else "X"
+                gap = r.get("optimality_gap_absolute")
+                if gap is not None and gap != 0:
+                    tag = f"{tag}(+{gap})" if r.get("valid") else tag
+                status_parts.append(f"{s['name']}={tag}")
+            print(
+                f"  [{idx}/{total}] {key}: {'  '.join(status_parts)}"
+                f"  [ETA {eta_min}m{eta_sec:02d}s]"
+            )
 
     elapsed_total = time.perf_counter() - sweep_start
-    print(f"\nCompleted {total} cases in {elapsed_total / 60:.1f} minutes.")
-    print(f"Saved to: {output_path}")
+    if verbose:
+        print(f"\nCompleted {total} cases in {elapsed_total / 60:.1f} minutes.")
+        print(f"Saved to: {output_path}")
     return output_path

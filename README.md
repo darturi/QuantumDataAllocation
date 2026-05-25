@@ -1,185 +1,284 @@
 # QuantumDataAllocation
 
-A benchmark suite for comparing Quantum Annealing formulations of the data allocation optimisation problem. The project encodes the same NP-hard placement problem — assigning replicated data partitions to capacity-constrained storage nodes to minimise remote communication cost — as three distinct QUBO (Quadratic Unconstrained Binary Optimisation) formulations, solves them with both simulated and real D-Wave quantum annealers, and measures solution quality against an exact ILP (Integer Linear Programming) baseline.
+A benchmark suite comparing Quantum Annealing formulations of the
+distributed-data-allocation optimisation problem against an ILP baseline.
+Two QUBO encodings are exercised by default — a slack-variable encoding
+(Trummer 2025) and a calibrated unbalanced-penalty encoding
+(Montañez-Barrera et al. 2022) — and the result of each run is checked
+against the exact optimum found by CBC.
 
+The repository began with a critical audit of an earlier version of the
+code (see `CRITICAL_REVIEW.md`) and a corresponding remediation plan
+(`REMEDIATION_PLAN.md`); the current state reflects the executed parts of
+that plan. `EXECUTION_SUMMARY.md` records what was done.
 
-## The Problem
+## The problem
 
-Given a distributed storage system with `N` nodes (each with a fixed capacity) and `P` data partitions (each with a size and a communication cost), find an assignment of partitions to nodes that:
+Given a distributed storage system with `N` nodes (each with a fixed
+capacity) and `P` data partitions (each with a size and a communication
+cost), find an assignment of partitions to nodes that:
 
-1. **k-Safety:** stores each partition on exactly `k` nodes (replication for fault tolerance).
-2. **Capacity:** does not exceed any node's storage capacity.
-3. **Minimum cost:** minimises `sum(r_pn * c_p * (1 − A_pn))` — the total cost of remote data fetches across all partition-node pairs where the partition is not stored locally.
+1. **k-safety**: stores each partition on exactly `k` nodes (replication
+   for fault tolerance);
+2. **capacity**: respects each node's storage capacity;
+3. **minimum cost**: minimises `Σ r_{p,n} · c_p · (1 − A_{p,n})` —
+   the total cost of remote data fetches.
 
-The ILP solver finds the provably optimal solution. The SQA solvers encode the constraints as penalty terms in a QUBO and approximate the optimum via quantum annealing, either simulated (Path Integral Monte Carlo on CPU) or on D-Wave hardware.
+The ILP solver finds the provably optimal solution.  The SQA solvers
+encode the same problem as a QUBO and approximate the optimum via
+simulated quantum annealing (Path Integral Monte Carlo on CPU) or — when
+configured — real D-Wave hardware.
 
+## QUBO formulations (current)
 
-## QUBO Formulations
+The repository implements three QUBO encodings; two are in the default
+benchmark registry, one is opt-in.
 
-Three formulations are implemented, each encoding the same constraints differently:
+| Label | File | Storage encoding | k-safety encoding | In default registry? |
+|-------|------|------------------|--------------------|-----------------------|
+| **S1** | `solvers/simulated_solvers/SQA.py` | Binary slack variables (Paper 1, faithful) | `(Σ A − k)²` | yes |
+| **S2** | `solvers/simulated_solvers/SQA_SF.py` | Unbalanced penalty with **calibrated** `(λ₁, λ₂)` (Paper 2, faithful) | `(Σ A − k)²` | yes |
+| **S3** | `solvers/simulated_solvers/SQA_DW.py` | Same as S2 | Chancellor domain-wall chain + linking | **no** (opt-in via `SOLVER_REGISTRY_SIM_WITH_S3`) |
 
-**S1 — Standard (SQA):** Uses binary slack variables to convert the storage capacity inequality into an equality. Requires node capacities to be Mersenne numbers (2^k − 1). Supports arbitrary partition sizes. Produces the largest BQMs due to slack variables.
+### Why S1 and S2 are equivalent in expressiveness
 
-**S2 — Slack-Free (SQA_SF):** Eliminates all slack variables using an unbalanced penalty function (Montañez-Barrera et al., 2022) that penalises capacity overflow directly. No Mersenne capacity restriction, but requires all partition sizes to equal 1. Produces the smallest BQMs.
+After the Phase-1 fix, S1 supports **arbitrary** integer capacities — its
+slack-chunk decomposition was generalised from the Mersenne-only binary
+expansion to `[1, 2, 4, …, 2^J, residual]` so that the chunks sum to
+exactly `C_n`.  After the Phase-2 fix, S2 supports arbitrary **partition
+sizes** — the unbalanced penalty's coefficients now include `size_p`
+explicitly.  Both solvers exercise the same problem on the same inputs;
+they only differ in how the storage inequality is encoded.
 
-**S3 — Domain-Wall (SQA_DW):** Replaces the O(N²) quadratic k-safety penalty with an O(N) nearest-neighbour domain-wall chain encoding (Chancellor, 2019). Combines this with the slack-free storage encoding from S2. More variables than S2 but sparser coupling — expected to embed more efficiently on hardware. Requires unit partition sizes.
+### Why S3 is opt-in, not default
 
+The original S3 was advertised as reducing k-safety couplings from
+`O(N²)` to `O(N)`.  In practice the data-allocation problem requires
+free `A_{p,n}` subset-selection variables (nodes are not
+interchangeable), so the domain-wall chain has to be linked back to `A`
+via `(Σ A − Σ W)² = 0`, which reintroduces `O(N²)` couplings.  The
+fixed S3 in this repo is correct (oracle test passes on loose cases,
+``pytest.skip`` on documented tight-case limits) and uses the same
+calibrated unbalanced storage as S2 — but it strictly **does not** beat
+S2 on this problem class.  Keeping it in the repo preserves the
+falsifiable negative result; demoting it from the default registry
+keeps headline numbers honest.  To run it deliberately, use
+`SOLVER_REGISTRY_SIM_WITH_S3` (see `util/experiment_execution/README.md`).
 
-## Project Structure
+## Project structure
 
 ```
 QuantumClean/
-├── README.md
-├── backfill_sqa_sf.py                  # temporary backfill script (see below)
+├── README.md                            ← this file
+├── CRITICAL_REVIEW.md                   ← initial audit
+├── REMEDIATION_PLAN.md                  ← phased remediation plan
+├── EXECUTION_SUMMARY.md                 ← what was actually executed
+├── pyproject.toml                       ← project metadata + pytest config
+├── requirements.txt                     ← pinned dependencies
 │
-├── solvers/                            # all solver implementations
-│   ├── README.md                       # overview of solvers directory
-│   ├── ILP.py                          # exact classical baseline (PuLP/CBC)
-│   ├── simulated_solvers/              # CPU-based SQA via PathIntegralAnnealingSampler
-│   │   ├── README.md                   # detailed formulation documentation
-│   │   ├── SQA.py                      # S1
-│   │   ├── SQA_SF.py                   # S2
-│   │   └── SQA_DW.py                   # S3
-│   └── quantum_hardware_solvers/       # D-Wave QPU versions
-│       ├── README.md                   # hardware parameters and QPU metadata docs
+├── solvers/                             ← all solver implementations
+│   ├── README.md
+│   ├── ILP.py                           ← exact classical baseline (PuLP/CBC)
+│   ├── simulated_solvers/
+│   │   ├── README.md
+│   │   ├── SQA.py                       ← S1
+│   │   ├── SQA_SF.py                    ← S2 (with calibrate_lambdas)
+│   │   └── SQA_DW.py                    ← S3 (opt-in)
+│   └── quantum_hardware_solvers/
+│       ├── README.md
 │       ├── __init__.py
-│       ├── SQA_HW.py                   # S1 on QPU
-│       ├── SQA_SF_HW.py               # S2 on QPU
-│       └── SQA_DW_HW.py               # S3 on QPU
+│       ├── SQA_HW.py                    ← S1 on QPU
+│       ├── SQA_SF_HW.py                 ← S2 on QPU
+│       └── SQA_DW_HW.py                 ← S3 on QPU
 │
 ├── util/
-│   ├── solver_base.py                  # abstract base class for all solvers
-│   ├── calculate_solution_cost.py      # cost calculation and validation utilities
-│   ├── test_generation/                # deterministic test case generation
+│   ├── solver_base.py
+│   ├── brute_force.py                   ← oracle for tests; exhaustive enumeration
+│   ├── calculate_solution_cost.py
+│   ├── test_generation/
 │   │   ├── README.md
-│   │   ├── populate_test_bank.py       # top-level orchestrator
-│   │   ├── generate_test_case.py       # arbitrary-partition generator
-│   │   ├── generate_unit_test_case.py  # unit-partition generator
-│   │   ├── generate_paired_test_cases.py  # matched-pair generator
-│   │   ├── generate_test_banks.py      # batch generation helper
-│   │   └── json_to_dict.py            # test case JSON loader
-│   └── experiment_execution/           # experiment harness
+│   │   ├── populate_test_bank.py
+│   │   ├── generate_test_case.py        ← arbitrary partitions; tightness-stratified
+│   │   ├── generate_unit_test_case.py   ← unit partitions; tightness-stratified
+│   │   ├── generate_paired_test_cases.py
+│   │   ├── generate_test_banks.py
+│   │   └── json_to_dict.py
+│   └── experiment_execution/
 │       ├── README.md
-│       ├── run_experiment.py           # core harness (ILP / SQA / QPU dispatch)
+│       ├── run_experiment.py            ← Phase-5 harness
 │       ├── run_unit_partition_experiment.py
 │       └── run_arbitrary_partition_experiment.py
 │
-├── test_bank/                          # pre-generated problem instances
-│   ├── unit_partition/
-│   │   ├── tier1/                      # 400 cases: 5 node counts × 8 partition counts × 10
-│   │   └── tier2/                      # 490 cases: 7 × 7 × 10
-│   └── arbitrary_partition/
-│       ├── tier1/                      # same grid as unit tier 1
-│       └── tier2/                      # same grid as unit tier 2
+├── tests/                               ← pytest suite; ExactSolver oracles
+│   ├── README.md
+│   ├── conftest.py                      ← shared problem fixtures
+│   ├── test_oracle.py                   ← QUBO ground state vs brute-force optimum
+│   ├── test_cost_and_validity.py        ← property tests for cost/validity
+│   ├── test_generators.py               ← feasibility / round-trip
+│   ├── test_harness.py                  ← Phase-5 result-field smoke test
+│   └── test_json_roundtrip.py
 │
-├── result_bank/                        # experiment outputs
-│   ├── simulated_solver_results/       # CPU-based SQA results
-│   │   ├── UnitExperiment_1.json
-│   │   └── ArbitraryExperiment_1.json
-│   └── quantum_hardware_results/       # D-Wave QPU results
+├── test_bank/                           ← pre-generated problem instances
+│   ├── unit_partition/{tier1,tier2}/n{N}_p{P}/t{30,70,100}/
+│   └── arbitrary_partition/{tier1,tier2}/n{N}_p{P}/t{30,70,90}/
 │
-└── result_analysis/                    # Jupyter notebooks for visualisation
-    ├── unit_sweep_analysis.ipynb       # unit-partition analysis (S1, S2, S3)
-    └── arbitrary_sweep_analysis.ipynb  # arbitrary-partition analysis (S1 only)
+├── result_bank/                         ← experiment outputs
+│   ├── simulated_solver_results/        ← SQA runner outputs (Unit/Arbitrary*.json)
+│   └── quantum_hardware_results/        ← QPU runner outputs
+│
+└── result_analysis/                     ← Jupyter notebooks (not in CI)
+    ├── unit_sweep_analysis.ipynb        ← schema-aware loader for UnitExperiment_*.json
+    ├── arbitrary_sweep_analysis.ipynb   ← schema-aware loader for ArbitraryExperiment_*.json
+    └── plots/                           ← PNGs the notebooks write on `plt.savefig`
 ```
 
+## Getting started
 
-## Getting Started
-
-### Prerequisites
-
-The simulated experiments require:
+### Install
 
 ```
-pip install dimod dwave-samplers pulp numpy pandas matplotlib
+pip install -r requirements.txt
+# optional, only for D-Wave hardware:
+pip install -e ".[hardware]"
 ```
 
-For D-Wave hardware experiments, additionally:
+### Run the tests
 
 ```
-pip install dwave-system
-dwave setup   # configure LEAP API token
+python -m pytest tests/ -v
 ```
 
-### Generating Test Cases
+The suite collects ~30 tests across `test_oracle.py`,
+`test_cost_and_validity.py`, `test_generators.py`, `test_harness.py`,
+and `test_json_roundtrip.py`.  Up to three of the S3 oracle
+parametrizations (`test_s3_ground_state_is_near_optimum`) may
+`pytest.skip` on tight-capacity fixtures where the redundant W+A
+encoding has no feasible ground state under unbalanced penalization
+alone -- this is the known structural limitation Paper 2
+acknowledges, documented in `solvers/simulated_solvers/SQA_DW.py`.
+Everything else should pass.
+
+### Generate a test bank
+
+```
+python -m util.test_generation.populate_test_bank          # lean grid, ~630 cases
+python -m util.test_generation.populate_test_bank --full   # full grid, ~5,340 cases
+```
+
+Test cases are stratified by **tightness** (`0.0` = loose capacity,
+`1.0` = exact min capacity), and feasibility is verified by an ILP
+probe inside the generator.  Capacities are *no longer* Mersenne-rounded
+— the S1 chunk encoding now handles arbitrary integers.
+
+The lean grid covers tier 1 (`n ∈ {3,5,9}`, `p ∈ {4,12,26,50}`) and
+tier 2 (`n ∈ {5,9,15}`, `p ∈ {18,50,100}`) with 5 paired cases at each
+of 3 tightness levels for both unit and arbitrary partitions
+(`3×4×3×5×2 + 3×3×3×5×2 = 630` cases before feasibility rejection).
+It is the default because paired comparisons between S1 and S2 reach
+significance with far fewer instances than the original sweep used.
+Use `--full` only when you need tight per-cell error bars or
+fine-grained scaling curves; expect hours-to-days of downstream run
+time.
+
+### Run a benchmark
 
 ```bash
-python -m util.test_generation.populate_test_bank
-```
-
-This creates 1,780 deterministic, seeded test cases across both partition types and both tiers. Running it again produces byte-identical output.
-
-### Running Experiments
-
-Simulated (CPU):
-
-```bash
-# Unit-partition benchmark (ILP + S1 + S2 + S3)
+# Default registry: ILP + S1 + S2
 python -m util.experiment_execution.run_unit_partition_experiment
-
-# Arbitrary-partition benchmark (ILP + S1 only — S2/S3 require unit partitions)
 python -m util.experiment_execution.run_arbitrary_partition_experiment
 ```
 
-D-Wave hardware:
+To opt in to S3 on the simulator:
+
+```python
+from util.experiment_execution.run_unit_partition_experiment import (
+    run_unit_experiment, SOLVER_REGISTRY_SIM_WITH_S3,
+)
+run_unit_experiment(extra_registry=SOLVER_REGISTRY_SIM_WITH_S3)
+```
+
+To run on D-Wave hardware (requires `dwave-system` + LEAP token):
 
 ```python
 from util.experiment_execution.run_unit_partition_experiment import run_unit_experiment
 
+# Default hardware registry: ILP + S1 (HW) + S2 (HW)
+run_unit_experiment(tier="tier1", hardware=True, num_reads=100, annealing_time=20)
+
+# Add S3 to a hardware run via the dedicated flag (ignored on simulator runs)
 run_unit_experiment(
-    tier="tier1",
-    hardware=True,
-    num_reads=100,
-    annealing_time=20,
+    tier="tier1", hardware=True, include_s3=True,
+    num_reads=100, annealing_time=20,
 )
 ```
 
-Results are written incrementally to `result_bank/` — interrupted runs preserve all completed test cases.
+Results are written incrementally to `result_bank/` — interrupted runs
+preserve all completed test cases.  Simulator runs land in
+`result_bank/simulated_solver_results/` as
+`UnitExperiment_N.json` / `ArbitraryExperiment_N.json` (`N` auto-
+increments); hardware runs land in `result_bank/quantum_hardware_results/`
+with the `_HW` prefix.
 
-### Analysis
+### Analyse results
 
-Open the Jupyter notebooks in `result_analysis/` to visualise results. The notebooks are configurable: edit the `SOLVERS` list at the top to include or exclude any subset of solvers, and all plots, heatmaps, and statistical comparisons adapt automatically.
+The two notebooks in `result_analysis/` consume the JSON files above
+directly.  Each notebook auto-detects which solvers are present in the
+file and picks up the **most recent** `UnitExperiment_*.json` or
+`ArbitraryExperiment_*.json` by default — replace `RESULTS_FILE` in the
+first cell to pin a specific run.
 
+```
+result_analysis/unit_sweep_analysis.ipynb        # for Unit*.json
+result_analysis/arbitrary_sweep_analysis.ipynb   # for Arbitrary*.json
+```
 
-## Test Bank
+Each notebook produces an aggregate summary, validity / gap heatmaps
+over the `(n_nodes, n_partitions)` grid, BQM size scaling curves, an
+S1-vs-S2 head-to-head scatter, the `(lambda_1, lambda_2)` distribution
+from the S2 calibrator, and a constraint-violation breakdown.  Saved
+plots are written to `result_analysis/plots/`.  The "Empirical
+Findings" markdown section at the bottom of each notebook records the
+numerical conclusions drawn from the latest result file checked in.
 
-Test cases are organised into two tiers of increasing problem size:
+## Result schema (Phase 5)
 
-| Tier | Nodes | Partitions | Cases per combo |
-|------|-------|------------|-----------------|
-| Tier 1 | 2, 3, 5, 7, 9 | 3, 4, 8, 12, 18, 26, 36, 50 | 10 |
-| Tier 2 | 2, 3, 5, 7, 9, 12, 15 | 3, 8, 18, 36, 50, 75, 100 | 10 |
+Every per-solver result entry contains:
 
-Each test case specifies node capacities (Mersenne numbers), partition sizes, a replication factor (k=2), per-(partition, node) request frequencies, and per-partition communication costs. Generation is deterministic via seeds derived from the problem parameters.
+| Field | All | SQA only | QPU only |
+|-------|-----|----------|----------|
+| `cost` | ✓ | | |
+| `valid` | ✓ | | |
+| `k_safety_violations` | ✓ | | |
+| `capacity_overruns` | ✓ | | |
+| `wall_time_ms` | ✓ | | |
+| `optimality_gap_absolute` | ✓ | | |
+| `optimality_gap_relative` | ✓ | | |
+| `error` | ✓ | | |
+| `bqm_variables` | | ✓ | ✓ |
+| `bqm_interactions` | | ✓ | ✓ |
+| `lambda_1`, `lambda_2` | | ✓ (S2/S3) | ✓ (S2/S3) |
+| `physical_qubits` | | | ✓ |
+| `chain_break_fraction` | | | ✓ |
+| `qpu_anneal_time_per_sample_us` | | | ✓ |
 
+`optimality_gap_relative` is `0.0` (not `null`) when both costs are `0`.
+`null` is reserved for cases where the relative gap is genuinely
+undefined (e.g. `ilp_cost == 0` but solver cost is non-zero).
 
-## Experiment Results
-
-Each experiment run produces a JSON file recording per-solver statistics for every test case:
-
-**All solvers:** cost, validity, solve time (ms), error status.
-
-**SQA/QPU solvers:** BQM variable count, BQM interaction count, optimality gap vs ILP.
-
-**QPU solvers additionally:** physical qubit count (post-embedding), chain break fraction, QPU access time (µs).
-
-
-## Key Findings (Simulated)
-
-The unit-partition analysis notebook documents several findings from the simulated experiments:
-
-- S2 (slack-free) achieves the best overall solution quality, with the lowest optimality gaps and highest validity rates. Its smaller BQM (no slack variables) gives the annealer a more tractable energy landscape.
-- S3 (domain-wall) shows an oscillating validity pattern at certain node counts (7, 9) caused by Mersenne capacity rounding creating alternating tight/loose fits as partition count grows. This is a confounding factor in the experimental design, not a formulation defect.
-- S1 (standard) validity degrades with problem size due to the exponential growth of slack variables, which dilute the annealer's search effort.
-- All three formulations show BQM variable/interaction counts that grow linearly with problem size, but at different rates — S2 is consistently the most compact.
-
-
-## Known Confounding Factor
-
-All node capacities are Mersenne numbers, a requirement of S1's binary slack encoding. This was applied uniformly across all formulations for fair comparison, but it creates a confounding factor: at certain (node, partition) combinations the Mersenne capacity exactly equals the total partition count, causing S2's unbalanced penalty to become identically zero and removing gradient signal for placement optimisation. This is documented in the analysis notebook conclusions and should be considered when interpreting results.
-
+Each top-level result entry also carries `n_nodes`, `n_partitions`,
+`k_safety`, `source_file`, and the test-case metadata surfaced from
+the input JSON under a `tc_` prefix (notably `tc_tightness`).  The
+analysis notebooks read `tc_tightness` to stratify metrics by
+storage-constraint tightness without re-opening the source test
+cases.
 
 ## References
 
-- Montañez-Barrera, J. A., et al. (2022). "Unbalanced penalization: A new approach to encode inequality constraints for quantum optimization algorithms." arXiv:2211.13914.
-- Chancellor, N. (2019). "Domain wall encoding of discrete variables for quantum annealing and QAOA." arXiv:1903.05068.
+- Trummer, I. (2025). "Leveraging Quantum Computing for Optimal Data
+  Allocation in Distributed Systems." Q-Data '25.
+- Montañez-Barrera, J. A., Willsch, D., Maldonado-Romo, A., Michielsen,
+  K. (2022). "Unbalanced penalization: A new approach to encode
+  inequality constraints for quantum optimization algorithms."
+  arXiv:2211.13914.
+- Chancellor, N. (2019). "Domain wall encoding of discrete variables
+  for quantum annealing and QAOA." arXiv:1903.05068.

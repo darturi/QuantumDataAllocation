@@ -1,178 +1,195 @@
 """
-S3 — SQA Domain-Wall + Slack-Free Unit-Partition Solver.
+S3 — SQA Domain-Wall + Unbalanced-Penalty Solver.
 
-Combines two optimisations on top of unit partition sizes:
+This solver combines:
 
-1. **Slack-free storage** (same as S2): eliminates all S_in slack variables
-   by encoding the cardinality constraint sum(A_pn) <= C_n directly as a
-   quadratic penalty using only A_pn variables.
+  * **Domain-wall k-safety encoding** (Chancellor 2019, arXiv:1903.05068).
+    For each partition p, introduce |N| binary "wall" variables
+    ``W_{p,1}, ..., W_{p,|N|}`` constrained to a monotone chain
+    ``W_{p,1} >= W_{p,2} >= ... >= W_{p,|N|}`` and forced to have exactly
+    k ones (i.e. ``W_{p,k} = 1``, ``W_{p,k+1} = 0``).  The chain
+    monotonicity is encoded with O(|N|) nearest-neighbour quadratic terms.
 
-2. **Domain-wall k-safety encoding**: replaces the standard one-hot penalty
-   (sum A_pn - k)^2 with a domain-wall encoding that uses nearest-neighbour
-   chain penalties, reducing the number of quadratic couplings from O(|N|^2)
-   to O(|N|) per partition.
+  * **Calibrated unbalanced-penalty storage** (Paper 2, see SQA_SF.py).
+    Identical to the S2 storage encoding, with ``(lambda_1, lambda_2)``
+    tuned per instance.
 
-Domain-wall encoding (Chancellor, 2019):
-    For each partition p, introduce |N|-1 auxiliary "wall" variables
-    w_{p,1}, ..., w_{p,|N|-1}.  These form a monotone chain:
-        w_{p,1} >= w_{p,2} >= ... >= w_{p,|N|-1}
-    The number of 1-bits in the chain represents the number of copies.
-    The chain constraint is enforced by penalising "walls" — transitions
-    from 0 to 1 (i.e., w_{p,j} = 0 and w_{p,j+1} = 1):
-        penalty_chain = h_dw * sum_{j=1}^{|N|-2}  w_{p,j+1} * (1 - w_{p,j})
+Honest caveat -- read this before using S3
+-------------------------------------------
+On the data-allocation problem, the domain-wall chain only replaces the
+``(sum_n A_{p,n} - k)^2`` penalty; the per-node assignment variables
+``A_{p,n}`` are still required (the nodes are not interchangeable: they
+have distinct storage capacities and per-(p,n) request frequencies).
+Linking the chain variables ``W_{p,*}`` back to the assignment variables
+``A_{p,*}`` via ``(sum_n A_{p,n} - sum_j W_{p,j})^2 = 0`` reintroduces
+``O(|N|^2)`` couplings.
 
-    To enforce exactly k copies, we fix the k-th wall variable to 1 and
-    the (k+1)-th wall variable to 0, or equivalently add penalties:
-        penalty_count = h_dw * (1 - w_{p,k})          (must have at least k)
-                      + h_dw * w_{p,k+1}               (must have at most k)
-    when k < |N|-1, etc.
-
-    The mapping from wall variables to assignment variables:
-        The j-th wall variable indicates "at least j copies exist".
-        A_pn is linked to the walls via: sum_n A_pn = sum_j w_{p,j}.
-        This is enforced by an equality constraint between the two sums.
-
-    Key benefit: the chain constraint has O(|N|) terms (nearest-neighbour)
-    vs. O(|N|^2) for the standard (sum - k)^2 penalty.
-
-References:
-    Chancellor, N. (2019). "Domain wall encoding of discrete variables for
-    quantum annealing and QAOA." arXiv:1903.05068.
+The net effect is therefore *not* a coupling-count reduction over S1/S2 --
+this solver exists to make that fact reproducible, not to claim a
+quantum-hardware speedup.  If you want the smallest BQM, use S2.
 """
 
 import time
+from typing import Optional
 
 import dimod
 import pandas as pd
 from dwave.samplers import PathIntegralAnnealingSampler
+
+from solvers.simulated_solvers.SQA_SF import calibrate_lambdas
 from util.solver_base import SolverBase
 
 
 class SQADomainWallSolver(SolverBase):
-    def __init__(self, nodes, partitions, k_safety, requests, comm_costs):
-        for p, size in partitions.items():
-            if size != 1:
-                raise ValueError(
-                    f"SQADomainWallSolver requires all partition sizes = 1, "
-                    f"but partition {p} has size {size}"
-                )
+    """S3 - domain-wall k-safety + calibrated unbalanced-penalty storage."""
+
+    def __init__(
+        self,
+        nodes,
+        partitions,
+        k_safety,
+        requests,
+        comm_costs,
+        lambda_1: Optional[float] = None,
+        lambda_2: Optional[float] = None,
+    ):
+        # S3 does NOT require unit partition sizes: the unbalanced
+        # storage penalty handles arbitrary sizes (same as S2).
         SolverBase.__init__(self, nodes, partitions, k_safety, requests, comm_costs)
 
+        if (lambda_1 is None) ^ (lambda_2 is None):
+            raise ValueError(
+                "Pass both lambda_1 and lambda_2, or neither (for auto-calibration)."
+            )
+
+        if lambda_1 is None:
+            # S3 calibration is more expensive than S2 because the BQM
+            # has |P| * |N| extra W variables, so ExactSolver scales
+            # as 2^(2 * |P| * |N|).  Limit exact calibration to small
+            # instances and use a heuristic for everything else.
+            n_a_vars = len(partitions) * len(nodes)
+            n_total_vars = n_a_vars * 2   # rough estimate including W
+
+            target = None
+            if n_a_vars <= 9:   # ExactSolver over <= ~2^18 states is OK
+                from util.brute_force import brute_force_solve
+                target, _ = brute_force_solve(
+                    nodes, partitions, k_safety, requests, comm_costs
+                )
+
+                def _builder(l1, l2):
+                    stash = (self.lambda_1, self.lambda_2) if hasattr(self, "lambda_1") else None
+                    self.lambda_1 = l1
+                    self.lambda_2 = l2
+                    bqm = self.build_bqm()
+                    if stash is not None:
+                        self.lambda_1, self.lambda_2 = stash
+                    return bqm
+
+                self.lambda_1, self.lambda_2 = 1.0, 1.0
+                self.lambda_1, self.lambda_2 = calibrate_lambdas(
+                    nodes, partitions, k_safety, requests, comm_costs,
+                    target_cost=target,
+                    max_vars_for_exact=n_total_vars + 1,
+                    bqm_builder=_builder,
+                )
+            else:
+                # Heuristic fallback for larger instances -- S3 is not
+                # recommended for these sizes anyway (see module docstring).
+                self.lambda_1, self.lambda_2 = calibrate_lambdas(
+                    nodes, partitions, k_safety, requests, comm_costs,
+                    target_cost=None,
+                    max_vars_for_exact=0,   # force heuristic branch
+                )
+        else:
+            if lambda_1 <= 0 or lambda_2 <= 0:
+                raise ValueError("lambda_1 and lambda_2 must be positive")
+            self.lambda_1 = float(lambda_1)
+            self.lambda_2 = float(lambda_2)
+
     def build_bqm(self):
-        """Build and return the BQM without solving."""
         bqm = dimod.BinaryQuadraticModel(dimod.BINARY)
 
         partition_list = list(self.partitions.keys())
         node_list = list(self.nodes.keys())
         num_nodes = len(node_list)
 
-        # 1. Assignment variables A_pn
-        A = {(p, n): f'A_{p}_{n}' for p in self.partitions for n in self.nodes}
+        A = {(p, n): f"A_{p}_{n}" for p in self.partitions for n in self.nodes}
+        W = {
+            (p, j): f"W_{p}_{j}"
+            for p in partition_list
+            for j in range(1, num_nodes + 1)
+        }
 
-        # 2. Domain-wall variables W_{p,j} for j = 1..num_nodes
-        #    W_{p,j} = 1 means "partition p has at least j copies"
-        #    Need num_nodes variables to represent values 0..num_nodes.
-        W = {}
-        for p in partition_list:
-            for j in range(1, num_nodes + 1):
-                W[(p, j)] = f'W_{p}_{j}'
-
-        # 3. Penalty weights
+        # ---- penalty weights ----
         h = sum(
             self.requests[p, n] * self.comm_costs[p]
             for p in self.partitions for n in self.nodes
         ) + 1
+        max_C = max(int(c) for c in self.nodes.values())
+        h_chain = h * max_C        # domain-wall + linking penalty weight
+        l1 = self.lambda_1
+        l2 = self.lambda_2
 
-        # Scale k-safety / domain-wall penalties by max capacity so they
-        # always dominate the under-capacity storage penalty.
-        h_k = h * max(self.nodes.values())
+        # ---- Q_R: domain-wall k-safety encoding ----
 
-        h_dw = h_k     # domain-wall penalty weight
-        h_link = h_k   # linking constraint weight
-        h_s = h        # storage penalty weight
-
-        # 4. Q_R: k-safety via DOMAIN-WALL encoding
-        #
-        # 4a. Chain monotonicity: w_{p,j} >= w_{p,j+1}
-        #     Penalty for violation: h_dw * w_{p,j+1} * (1 - w_{p,j})
-        #     = h_dw * (w_{p,j+1} - w_{p,j} * w_{p,j+1})
+        # (a) Chain monotonicity: penalise W_{j+1}=1 while W_j=0
+        #     penalty = h_chain * (W_{j+1} - W_j * W_{j+1})
         for p in partition_list:
             for j in range(1, num_nodes):
-                # Penalise w_{j+1}=1, w_j=0  (domain wall violation)
-                bqm.add_variable(W[p, j + 1], h_dw)        # linear: +h_dw * w_{j+1}
-                bqm.add_interaction(W[p, j], W[p, j + 1], -h_dw)  # quad: -h_dw * w_j * w_{j+1}
+                bqm.add_variable(W[p, j + 1], h_chain)
+                bqm.add_interaction(W[p, j], W[p, j + 1], -h_chain)
 
-        # 4b. Fix count to exactly k:
-        #     - w_{p,k} must be 1  =>  penalty h_dw * (1 - w_{p,k})
-        #     - w_{p,k+1} must be 0  =>  penalty h_dw * w_{p,k+1}
-        #     (only if the index exists)
+        # (b) Fix count to exactly k: penalise W_{p,k}=0 and W_{p,k+1}=1
         k = self.k_safety
         for p in partition_list:
             if 1 <= k <= num_nodes:
-                # w_{p,k} must be 1: penalty = h_dw * (1 - w_{p,k})
-                bqm.add_variable(W[p, k], -h_dw)
-                # (the constant h_dw is dropped since it doesn't affect optimisation)
-
+                bqm.add_variable(W[p, k], -h_chain)
             if k + 1 <= num_nodes:
-                # w_{p,k+1} must be 0: penalty = h_dw * w_{p,k+1}
-                bqm.add_variable(W[p, k + 1], h_dw)
+                bqm.add_variable(W[p, k + 1], h_chain)
 
-        # 4c. Link domain-wall variables to assignment variables:
-        #     sum_n A_pn = sum_j W_{p,j}
+        # (c) Link chain to assignment: (sum_n A_{p,n} - sum_j W_{p,j})^2 == 0
         #
-        #     We enforce this as an equality constraint:
-        #     (sum_n A_pn - sum_j W_{p,j})^2 = 0
-        #
-        #     This produces:
-        #     - A_pn * A_pn' interactions for n != n'  (but fewer than (sum-k)^2
-        #       because we're linking to W rather than to a constant)
-        #     - W * W interactions (nearest-neighbour from chain)
-        #     - A * W cross-interactions
-        #
-        #     The total coupling count is O(|N|^2 + |N|^2) in the worst case
-        #     for the linking constraint.  However, the chain constraint is
-        #     only O(|N|), and the linking can be decomposed if needed.
-        #
-        #     For now we use dimod's built-in equality constraint.
+        # NOTE: this reintroduces O(|N|^2) couplings -- see the module
+        # docstring.  We keep it because dropping it disconnects A from W
+        # and would let the solver pick any subset.
         for p in partition_list:
-            link_expr = []
-            for n in node_list:
-                link_expr.append((A[p, n], 1))
-            for j in range(1, num_nodes + 1):
-                link_expr.append((W[p, j], -1))
+            expr = [(A[p, n], 1) for n in node_list]
+            expr += [(W[p, j], -1) for j in range(1, num_nodes + 1)]
             bqm.add_linear_equality_constraint(
-                link_expr, constant=0, lagrange_multiplier=h_link
+                expr, constant=0, lagrange_multiplier=h_chain
             )
 
-        # 5. Q_S: storage constraints (SLACK-FREE, same as S2)
-        #    (sum_p A_pn - C_n)^2 using only A_pn variables
-        for n in node_list:
-            capacity = self.nodes[n]
-
-            for i in range(len(partition_list)):
+        # ---- Q_S: unbalanced-penalty storage (same as S2) ----
+        for n, capacity in self.nodes.items():
+            C = int(capacity)
+            for i, p in enumerate(partition_list):
+                size_p = int(self.partitions[p])
+                lin = l1 * size_p + l2 * (size_p * size_p - 2 * C * size_p)
+                bqm.add_variable(A[p, n], lin)
                 for j in range(i + 1, len(partition_list)):
-                    p1 = partition_list[i]
                     p2 = partition_list[j]
-                    bqm.add_interaction(A[p1, n], A[p2, n], 2 * h_s)
+                    size_p2 = int(self.partitions[p2])
+                    bqm.add_interaction(
+                        A[p, n], A[p2, n],
+                        2 * l2 * size_p * size_p2,
+                    )
 
-            for p in partition_list:
-                bqm.add_variable(A[p, n], h_s * (2 - 2 * capacity))
-
-        # 6. Q_C: processing costs
+        # ---- Q_C: processing costs ----
         for p in self.partitions:
             for n in self.nodes:
-                bqm.add_variable(A[p, n], -self.requests[p, n] * self.comm_costs[p])
+                bqm.add_variable(
+                    A[p, n], -self.requests[p, n] * self.comm_costs[p]
+                )
 
         return bqm
 
     def solve(self, num_reads=1000, num_sweeps=1000, beta_range=None):
         bqm = self.build_bqm()
-
         sampler = PathIntegralAnnealingSampler()
-
         sample_kwargs = dict(num_reads=num_reads, num_sweeps=num_sweeps)
         if beta_range is not None:
-            sample_kwargs['beta_range'] = beta_range
+            sample_kwargs["beta_range"] = beta_range
 
         start = time.perf_counter()
         sampleset = sampler.sample(bqm, **sample_kwargs)
@@ -188,15 +205,13 @@ class SQADomainWallSolver(SolverBase):
         if sample_obj is None:
             print("No valid solution found.")
             return
-
         best_sample = sample_obj.sample
         allocation_data = []
         for p in self.partitions:
-            row = {'Partition': p}
+            row = {"Partition": p}
             for n in self.nodes:
-                row[n] = best_sample[f'A_{p}_{n}']
+                row[n] = best_sample[f"A_{p}_{n}"]
             allocation_data.append(row)
-
-        matrix_df = pd.DataFrame(allocation_data).set_index('Partition')
-        print("--- Data Allocation Matrix (S3 Domain-Wall) ---")
+        matrix_df = pd.DataFrame(allocation_data).set_index("Partition")
+        print("--- Data Allocation Matrix (S3 Domain-Wall + Unbalanced) ---")
         print(matrix_df)

@@ -1,294 +1,291 @@
 # Experiment Execution
 
-This directory contains the harness for running benchmark experiments against the pre-generated test cases in `test_bank/`. The harness loads test cases from disk, runs every registered solver on each one, records a set of statistics about each solver's output, and writes the results incrementally to a JSON file in `result_bank/`.
+The harness in this directory loads pre-generated test cases from
+`test_bank/`, runs every registered solver on each one, records a set
+of statistics about the output, and writes results incrementally to a
+JSON file in `result_bank/`.
 
-The harness supports three solver types: classical ILP (baseline), simulated SQA (Path Integral Monte Carlo on CPU), and QPU (real D-Wave quantum hardware). Simulated and hardware results are written to separate directories so they can be analysed independently.
-
+It supports three solver types: classical ILP (baseline), simulated SQA
+(Path Integral Monte Carlo on CPU), and QPU (D-Wave hardware).
+Simulated and hardware results are written to separate directories.
 
 ## Quick start
 
-From the QuantumClean project root:
-
 ```bash
-# Run the unit-partition benchmark (tier 1, simulated solvers)
+# Default registry: ILP + S1 + S2.  Sampler budget defaults are
+# num_reads=200, num_sweeps=500 -- tuned for the lean tier-1 test bank.
 python -m util.experiment_execution.run_unit_partition_experiment
-
-# Run the arbitrary-partition benchmark (tier 1, ILP + simulated SQA only)
 python -m util.experiment_execution.run_arbitrary_partition_experiment
 ```
 
-To run on D-Wave hardware instead, call the wrapper functions with `hardware=True`:
+For the full grid or tier 2, raise the sampler budget back up (see
+"Sampler budget" below):
 
 ```python
 from util.experiment_execution.run_unit_partition_experiment import run_unit_experiment
-
-run_unit_experiment(
-    tier="tier1",
-    hardware=True,
-    num_reads=100,
-    annealing_time=20,
-)
+run_unit_experiment(tier="tier2", num_reads=1000, num_sweeps=1000)
 ```
 
-Both commands require the test bank to be populated first. If `test_bank/` is empty, run `python -m util.test_generation.populate_test_bank` beforehand. Hardware mode additionally requires `dwave-system` installed and a LEAP API token configured (see `solvers/quantum_hardware_solvers/README.md`).
+To opt in to S3 (see below):
 
+```python
+from util.experiment_execution.run_unit_partition_experiment import (
+    run_unit_experiment, SOLVER_REGISTRY_SIM_WITH_S3,
+)
+run_unit_experiment(extra_registry=SOLVER_REGISTRY_SIM_WITH_S3)
+```
+
+To run on D-Wave hardware (`pip install -e ".[hardware]"` + LEAP token):
+
+```python
+from util.experiment_execution.run_unit_partition_experiment import run_unit_experiment
+run_unit_experiment(tier="tier1", hardware=True, num_reads=100, annealing_time=20)
+```
+
+Hardware mode also supports S3 via `include_s3=True`.
 
 ## File overview
 
 | File | Purpose |
-|---|---|
-| `run_experiment.py` | Core harness. Provides `run_experiment()`, which takes a list of test case paths and a solver registry, runs everything, and writes the result JSON. Also provides `discover_test_cases()` for finding and filtering test cases on disk, and three internal runners: `_run_ilp()`, `_run_sqa()`, and `_run_qpu()`. |
-| `run_unit_partition_experiment.py` | Thin wrapper for unit-partition benchmarks. Registers ILP + SQA + SQA_SF + SQA_DW (simulated) or ILP + SQA_HW + SQA_SF_HW + SQA_DW_HW (hardware). Discovers test cases from `test_bank/unit_partition/` and writes results as `UnitExperiment_N.json` or `UnitExperiment_HW_N.json`. |
-| `run_arbitrary_partition_experiment.py` | Thin wrapper for arbitrary-partition benchmarks. Registers ILP + SQA (simulated) or ILP + SQA_HW (hardware). Only S1 supports arbitrary partition sizes, so S2/S3 are excluded. Writes results as `ArbitraryExperiment_N.json` or `ArbitraryExperiment_HW_N.json`. |
+|------|---------|
+| `run_experiment.py` | Core Phase-5 harness.  `run_experiment(...)`, `discover_test_cases(...)`, plus per-type runners (`_run_ilp`, `_run_sqa`, `_run_qpu`). |
+| `run_unit_partition_experiment.py` | Thin wrapper.  Defines `SOLVER_REGISTRY_SIM` (ILP + S1 + S2) and `SOLVER_REGISTRY_SIM_WITH_S3` (adds S3).  Writes results as `UnitExperiment_N.json`. |
+| `run_arbitrary_partition_experiment.py` | Same shape as the unit runner.  S1 and S2 both support arbitrary partition sizes after Phase 2, so both are in the default registry. |
 
-The two wrapper scripts are intentionally short. Each one wires up the right test-case directory, solver list, and output prefix, then delegates to the core harness. Hardware solver imports are deferred inside a `_get_hw_registry()` function so the files don't error out on machines without `dwave-system` installed.
+## Default vs opt-in registries
 
+| Registry | Solvers | When to use |
+|----------|---------|--------------|
+| `SOLVER_REGISTRY_SIM` (default) | ILP, S1, S2 | Headline benchmark runs |
+| `SOLVER_REGISTRY_SIM_WITH_S3` | ILP, S1, S2, **S3** | To reproduce the documented S3 negative result |
+| `_get_hw_registry()` (default) | S1 HW, S2 HW (plus ILP from the sim registry) | Hardware runs |
+| `_get_hw_registry(include_s3=True)` | adds S3 HW | Hardware S3 reproduction |
+
+S3 is opt-in because its claimed coupling reduction does not
+materialise on this problem class — see
+[`../../solvers/simulated_solvers/README.md`](../../solvers/simulated_solvers/README.md).
+The implementation is correct (it passes the loose-case oracle test) but
+strictly dominated by S2 on every metric I measured.
 
 ## Solver types and dispatch
 
-The `run_experiment()` harness dispatches to a type-specific runner based on each solver's `"type"` field:
+`run_experiment()` dispatches by the `"type"` field in each registry
+entry:
 
 | Type | Runner | Solver interface | Parameters passed |
-|---|---|---|---|
-| `"ilp"` | `_run_ilp()` | `solver.solve()` (no args) | None |
+|------|--------|------------------|-------------------|
+| `"ilp"` | `_run_ilp()` | `solver.solve()` | None |
 | `"sqa"` | `_run_sqa()` | `solver.solve(num_reads, num_sweeps, beta_range)` | `num_reads`, `num_sweeps`, `beta_range` |
 | `"qpu"` | `_run_qpu()` | `solver.solve(num_reads, annealing_time, chain_strength)` | `num_reads`, `annealing_time`, `chain_strength` |
 
-All three runners call `build_bqm()` before solving (for SQA and QPU types) to record BQM statistics, then evaluate the result with `calculate_solution_cost()` and `is_valid_solution()`. The QPU runner additionally calls `solver.hardware_summary()` to capture QPU-specific metadata.
+Registry entries can also carry `"kwargs": {...}` which are passed to
+the solver constructor — useful for pinning S2/S3 lambdas:
 
+```python
+{"name": "SQA_SF_fixed", "class": SQASlackFreeSolver, "type": "sqa",
+ "kwargs": {"lambda_1": 200.0, "lambda_2": 0.5}}
+```
 
-## `run_experiment()` parameters
+## Test-case metadata in results
 
-| Parameter | Type | Default | Used by |
-|---|---|---|---|
-| `test_case_paths` | `list[Path]` | — | All |
-| `solver_registry` | `list[dict]` | — | All |
-| `output_dir` | `str` or `Path` | — | All |
-| `file_prefix` | `str` | `"Experiment"` | All |
-| `num_reads` | `int` | 1000 | SQA, QPU |
-| `num_sweeps` | `int` | 1000 | SQA only |
-| `beta_range` | `tuple` or `None` | `None` | SQA only |
-| `annealing_time` | `int` | 20 | QPU only |
-| `chain_strength` | `float` or `None` | `None` | QPU only |
-| `note` | `str` or `None` | `None` | All |
+Every per-case entry carries the test-case JSON's input dimensions
+(`n_nodes`, `n_partitions`, `k_safety`) plus any **metadata** fields
+from the source JSON, prefixed with `tc_` to avoid colliding with
+solver-result keys.  Currently the only such field is:
 
+| Entry key | Source | Description |
+|-----------|--------|-------------|
+| `tc_tightness` | `tightness` in test-case JSON | Storage-constraint tightness in `[0, 1]`.  Lets downstream analysis stratify results by how much the capacity constraint binds. |
 
-## Wrapper script parameters
+Any new metadata added to the generator will surface automatically
+under the same `tc_*` prefix -- no harness change required.
 
-Both `run_unit_experiment()` and `run_arbitrary_experiment()` accept all of the parameters above (except `test_case_paths`, `solver_registry`, `output_dir`, and `file_prefix`, which they set internally), plus:
+## Recorded statistics (Phase 5 schema)
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `tier` | `str` or `None` | `None` | `"tier1"`, `"tier2"`, or `None` (both tiers) |
-| `node_counts` | `list[int]` or `None` | `None` | Filter by node count, e.g. `[3, 5]` |
-| `partition_counts` | `list[int]` or `None` | `None` | Filter by partition count, e.g. `[8, 18]` |
-| `max_cases` | `int` or `None` | `None` | Cap total test cases |
-| `hardware` | `bool` | `False` | If `True`, use QPU hardware solvers instead of simulated |
+Every per-solver result entry contains:
 
-
-## Recorded statistics
-
-Every test case produces a per-solver result entry. The fields differ by solver type.
-
-### ILP results
+### All solvers
 
 | Field | Description |
-|---|---|
-| `cost` | Total communication cost. `null` if the solver failed. |
-| `valid` | Whether the solution satisfies all constraints. |
-| `time_ms` | Wall-clock solve time in milliseconds. |
-| `error` | Error message if the solver threw an exception, otherwise `null`. |
+|-------|-------------|
+| `cost` | Total communication cost.  `null` if the solver failed. |
+| `valid` | Whether the solution satisfies *all* constraints. |
+| `k_safety_violations` | Number of partitions whose copy count ≠ k_safety. |
+| `capacity_overruns` | Number of nodes whose load exceeds capacity. |
+| `wall_time_ms` | Wall-clock `solve()` duration in milliseconds. |
+| `optimality_gap_absolute` | `solver_cost − ilp_cost` (may be negative if ILP failed but solver didn't). |
+| `optimality_gap_relative` | `(solver_cost − ilp_cost) / ilp_cost`; `0.0` when both costs are zero; `null` only when genuinely undefined. |
+| `error` | Exception message if the solver threw, otherwise `null`. |
 
-### SQA results (simulated)
-
-All ILP fields, plus:
-
-| Field | Description |
-|---|---|
-| `bqm_variables` | Number of variables in the BQM. |
-| `bqm_interactions` | Number of quadratic interactions (couplings) in the BQM. |
-| `optimality_gap` | `(sqa_cost - ilp_cost) / ilp_cost`. `null` if either solution is invalid or ILP cost is zero. |
-
-### QPU results (hardware)
-
-All SQA fields, plus:
+### SQA solvers (additional)
 
 | Field | Description |
-|---|---|
-| `physical_qubits` | Total physical qubits used after minor embedding (sum of all chain lengths). |
-| `chain_break_fraction` | Mean fraction of samples containing at least one broken chain. 0.0 means no breaks. |
-| `qpu_access_time_us` | Total time the job occupied the QPU, in microseconds. More scientifically meaningful than wall-clock time, which is dominated by network latency. |
+|-------|-------------|
+| `bqm_variables` | BQM variable count. |
+| `bqm_interactions` | BQM quadratic coupling count. |
+| `lambda_1`, `lambda_2` | Calibrated lambdas (S2, S3 only; `null` for S1). |
 
+### QPU solvers (additional, on top of SQA fields)
+
+| Field | Description |
+|-------|-------------|
+| `physical_qubits` | Sum of chain lengths after minor embedding. |
+| `chain_break_fraction` | Mean fraction of samples with broken chains. |
+| `qpu_anneal_time_per_sample_us` | Anneal duration per sample.  Use this, not wall time, for hardware comparisons. |
 
 ### How each statistic is calculated
 
-**Communication cost.** This is the objective function the solvers are minimising. For a solution with assignment variables A_pn (1 if partition p is stored on node n, 0 otherwise):
+**Communication cost.**  The objective the solvers are minimising:
 
 ```
-cost = sum over all (p, n):  r_pn * c_p * (1 - A_pn)
+cost = Σ over (p, n):  r_{p,n} · c_p · (1 − A_{p,n})
 ```
 
-where r_pn is the request frequency for partition p at node n, and c_p is the communication cost for partition p. In plain terms: every time a partition is *not* stored locally on a node that requests it, the system pays the remote-fetch cost. The ILP finds the exact minimum; the SQA and QPU solvers approximate it.
+For every (partition, node) pair where the partition is *not* stored,
+we pay the remote-fetch cost.  ILP finds the exact minimum; SQA/QPU
+solvers approximate it.
 
-**Validity.** A solution is valid if and only if it satisfies both constraints:
+**Validity.**  A solution is valid iff:
 
-1. *k-Safety*: each partition is assigned to exactly k nodes (where k = k_safety, typically 2).
-2. *Storage capacity*: the total size of partitions assigned to each node does not exceed that node's capacity.
+1. Each partition is stored on exactly `k_safety` nodes.
+2. Each node's load (sum of assigned partition sizes) ≤ capacity.
 
-The ILP enforces these as hard constraints. The SQA/QPU solvers encode them as penalty terms in the QUBO, so solutions can violate constraints if the penalty weights are insufficient or the annealer doesn't find a low-energy state.
+ILP enforces these as hard constraints; QUBO solvers encode them as
+penalty terms, so violations are possible if penalties are insufficient
+or the annealer doesn't reach the ground state.
 
-**BQM variables.** The total number of binary variables in the QUBO formulation. This includes assignment variables (one per partition-node pair) plus any auxiliary variables (slack variables for S1, domain-wall chain variables for S3). Fewer variables generally means a smaller problem. For hardware, fewer logical variables also means fewer physical qubits after embedding.
+**`k_safety_violations` and `capacity_overruns`.**  Counts of the two
+constraint families above.  Together with `valid`, these turn "the
+solver failed" into a useful signal — you can distinguish "barely
+infeasible" from "wildly wrong".
 
-**BQM interactions.** The number of quadratic couplings in the QUBO. Reflects the density of the problem graph. Denser graphs are harder to embed on sparse hardware topologies.
+**Absolute vs relative gap.**  The absolute gap is always
+`solver_cost − ilp_cost`.  The relative gap divides by `ilp_cost` —
+but only when that's safe.  When both costs are zero (trivial
+instances), relative is `0.0` (not `null`), which lets aggregate stats
+include those cases.  When `ilp_cost == 0` but the solver returned a
+non-zero cost, relative is `null` (the ratio is undefined; the absolute
+gap captures the failure).
 
-**Optimality gap.** Measures how far a solution is from the ILP optimum, as a fraction. A gap of 0.0 means the solver matched the ILP exactly; 0.15 means 15% higher cost. Only computed when both solutions are valid and the ILP cost is non-zero.
+**BQM variables / interactions.**  Number of binary variables and
+quadratic couplings.  Smaller is generally better (fewer qubits, less
+embedding overhead), but fewer variables doesn't mean a better
+formulation if it's solving a different problem.
 
-**Solve time.** Wall-clock time measured with `time.perf_counter()` around the solver's `.solve()` call. For ILP this is the CBC branch-and-bound solve. For simulated SQA this includes all `num_reads` annealing runs. For QPU this includes network latency, embedding, QPU queue wait, and readout — use `qpu_access_time_us` for the actual hardware time. Times are in milliseconds, rounded to one decimal place.
+**Lambdas.**  For S2 and S3, the calibrated `(λ₁, λ₂)` pair used to
+build the BQM.  Recorded so any result can be reproduced exactly.
 
-**Physical qubits (QPU only).** When a logical BQM is embedded onto D-Wave's hardware graph, each logical variable may require multiple physical qubits chained together. This field is the sum of all chain lengths across all variables. Comparing this across formulations shows which encoding maps most efficiently to hardware.
+**Solve time.**  Wall-clock around `solver.solve()`.  Not directly
+comparable across types — CBC startup, PIMC sweep cost, and network
+RTT live in different orders of magnitude.  Treat as a budget tracker,
+not a quantum-speedup metric.  For QPU comparisons, use
+`qpu_anneal_time_per_sample_us`.
 
-**Chain break fraction (QPU only).** Physical qubit chains can "break" during annealing — the qubits in a chain disagree on their value. A high chain break fraction (> 0.1) typically indicates the chain strength is too low. This metric is essential for diagnosing poor QPU solution quality.
+## Sampler budget
 
-**QPU access time (QPU only).** The actual time the job spent on the QPU, in microseconds. This excludes network round-trip time, queue wait, and embedding computation, making it the appropriate metric for comparing hardware execution speed. The full timing breakdown (programming time, sampling time, readout time) is available on the solver object via `solver.qpu_timing` after a run, but only `qpu_access_time_us` is written to the results JSON.
+`num_reads` and `num_sweeps` are the dominant wall-clock levers for
+SQA runs.  The defaults are tuned for the **lean** test bank:
 
+| Problem size (BQM vars) | Recommended num_reads × num_sweeps |
+|--------------------------|-------------------------------------|
+| ≤ 20 | 100 × 200 |
+| 20–40 | **200 × 500 (default)** |
+| 40–80 | 500 × 1000 |
+| > 80 | 1000 × 1000 |
+
+For tier 1 unit, almost all cases have ≤ 50 BQM variables, so the
+defaults are appropriate.  For tier 2 or the full grid, bump to
+`num_reads=1000, num_sweeps=1000` (the previous default).
+
+Reducing the sampler budget cuts wall time roughly linearly; cutting
+test-case counts also cuts wall time linearly.  Together a tier-1 unit
+sweep at lean defaults runs in tens of minutes rather than hours.
 
 ## Filtering and partial runs
-
-Both wrapper scripts accept optional filters so you can run subsets of the test bank:
 
 ```python
 from util.experiment_execution.run_unit_partition_experiment import run_unit_experiment
 
-# Simulated: tier 1, only 3-node and 5-node problems
+# Tier 1, only 3-node and 5-node problems
 run_unit_experiment(tier="tier1", node_counts=[3, 5])
 
-# Simulated: tier 2 cases with 50 or 100 partitions
+# Tier 2 cases with 50 or 100 partitions
 run_unit_experiment(tier="tier2", partition_counts=[50, 100])
 
 # Quick sanity check: first 10 test cases only
 run_unit_experiment(max_cases=10)
 
-# Adjust simulated SQA parameters
+# Adjust SQA parameters
 run_unit_experiment(num_reads=500, num_sweeps=500)
 
-# Hardware: tier 1, small problems only, with custom anneal time
+# Hardware: tier 1, small problems, custom anneal time
 run_unit_experiment(
-    tier="tier1",
-    hardware=True,
-    node_counts=[2, 3],
-    num_reads=200,
-    annealing_time=50,
-)
-
-# Hardware: explicit chain strength
-run_unit_experiment(
-    tier="tier1",
-    hardware=True,
-    num_reads=100,
-    chain_strength=2.5,
+    tier="tier1", hardware=True, node_counts=[2, 3],
+    num_reads=200, annealing_time=50,
 )
 ```
 
-The `discover_test_cases()` function handles the filtering. It parses directory names (e.g. `n5_p18`) to match against `node_counts` and `partition_counts`, and applies `max_cases` as a hard cap after filtering.
-
-
 ## Result output
 
-Simulated and hardware results are written to separate directories with auto-incrementing filenames. Each run produces a new file — previous results are never overwritten.
+Auto-incrementing filenames, separate directories for simulated vs
+hardware:
 
 ```
 result_bank/
     simulated_solver_results/
         UnitExperiment_1.json
-        UnitExperiment_2.json
         ArbitraryExperiment_1.json
-        ...
     quantum_hardware_results/
         UnitExperiment_HW_1.json
-        ArbitraryExperiment_HW_1.json
-        ...
 ```
 
-### Simulated result JSON structure
+Each run produces a new file; previous results are never overwritten.
 
-```json
-{
-    "metadata": {
-        "date": "2026-05-11",
-        "time": "14:30:00",
-        "total_cases": 400,
-        "num_reads": 1000,
-        "num_sweeps": 1000,
-        "solvers": ["ILP", "SQA", "SQA_SF", "SQA_DW"],
-        "note": "Unit-partition benchmark: all partition sizes = 1."
-    },
-    "results": {
-        "n-3_p-8_1": {
-            "source_file": "unit_partition/tier1/n3_p8/n-3_p-8_1.json",
-            "n_nodes": 3,
-            "n_partitions": 8,
-            "k_safety": 2,
-            "solvers": {
-                "ILP": {
-                    "cost": 42,
-                    "valid": true,
-                    "time_ms": 1.3,
-                    "error": null
-                },
-                "SQA": {
-                    "cost": 48,
-                    "valid": true,
-                    "time_ms": 350.2,
-                    "bqm_variables": 38,
-                    "bqm_interactions": 95,
-                    "error": null,
-                    "optimality_gap": 0.1429
-                }
-            }
-        }
-    }
-}
-```
-
-### Hardware result JSON structure
-
-Hardware results include the same fields as simulated results, plus QPU-specific metadata. The metadata block includes `annealing_time` instead of `num_sweeps`, and optionally `chain_strength` if one was specified.
+### Sample result JSON (Phase 5)
 
 ```json
 {
     "metadata": {
         "date": "2026-05-15",
-        "time": "10:00:00",
-        "total_cases": 400,
-        "num_reads": 100,
-        "annealing_time": 20,
-        "solvers": ["ILP", "SQA_HW", "SQA_SF_HW", "SQA_DW_HW"],
-        "note": "Unit-partition benchmark (D-Wave QPU): all partition sizes = 1."
+        "time": "10:30:00",
+        "total_cases": 6,
+        "num_reads": 500,
+        "num_sweeps": 500,
+        "solvers": ["ILP", "SQA", "SQA_SF"],
+        "harness_version": "phase5",
+        "note": "Unit-partition benchmark: all partition sizes = 1."
     },
     "results": {
-        "n-3_p-8_1": {
-            "source_file": "unit_partition/tier1/n3_p8/n-3_p-8_1.json",
-            "n_nodes": 3,
-            "n_partitions": 8,
-            "k_safety": 2,
+        "unit_n3p5_t70_1": {
+            "source_file": "result_bank/verification_small/cases/unit_n3p5_t70_1.json",
+            "n_nodes": 3, "n_partitions": 5, "k_safety": 2,
             "solvers": {
                 "ILP": {
-                    "cost": 42,
-                    "valid": true,
-                    "time_ms": 1.3,
-                    "error": null
+                    "cost": 88, "valid": true,
+                    "k_safety_violations": 0, "capacity_overruns": 0,
+                    "wall_time_ms": 2.3, "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
                 },
-                "SQA_HW": {
-                    "cost": 48,
-                    "valid": true,
-                    "time_ms": 4520.1,
-                    "bqm_variables": 38,
-                    "bqm_interactions": 95,
-                    "physical_qubits": 142,
-                    "chain_break_fraction": 0.023,
-                    "qpu_access_time_us": 18540,
+                "SQA": {
+                    "cost": 88, "valid": true,
+                    "k_safety_violations": 0, "capacity_overruns": 0,
+                    "wall_time_ms": 1177.3,
+                    "bqm_variables": 24, "bqm_interactions": 99,
+                    "lambda_1": null, "lambda_2": null,
                     "error": null,
-                    "optimality_gap": 0.1429
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
+                },
+                "SQA_SF": {
+                    "cost": 88, "valid": true,
+                    "k_safety_violations": 0, "capacity_overruns": 0,
+                    "wall_time_ms": 587.7,
+                    "bqm_variables": 15, "bqm_interactions": 45,
+                    "lambda_1": 952.5, "lambda_2": 0.1,
+                    "error": null,
+                    "optimality_gap_absolute": 0,
+                    "optimality_gap_relative": 0.0
                 }
             }
         }
@@ -296,44 +293,42 @@ Hardware results include the same fields as simulated results, plus QPU-specific
 }
 ```
 
-Each entry in `results` is keyed by the test case filename stem (e.g. `n-3_p-8_1`). The `source_file` field records the path relative to the test bank root, so you can trace any result back to its input.
-
+`metadata.harness_version: "phase5"` marks files written by the
+post-remediation harness; older files lack this field.
 
 ## Incremental saves
 
-The harness writes the full JSON to disk after every single test case. This means that if a long experiment is interrupted (crash, Ctrl-C, laptop running out of battery), all completed results are preserved in the output file. You can inspect partial results while an experiment is still running.
-
+The harness writes the full JSON to disk after every test case, so an
+interrupted run preserves all completed results.  `_NumpyEncoder` is
+installed on every write (Phase 5 fix — the old harness defined the
+encoder but didn't always install it, which would corrupt mid-run
+saves when a solver returned numpy scalars).
 
 ## Solver registry format
 
-Each solver is registered as a dict with three keys:
-
 ```python
-{"name": "SQA_DW", "class": SQADomainWallSolver, "type": "sqa"}
+{"name": "SQA_SF", "class": SQASlackFreeSolver, "type": "sqa",
+ "kwargs": {"lambda_1": 200.0, "lambda_2": 0.5}}     # kwargs optional
 ```
 
-The `type` field determines how the harness invokes the solver:
-
-- `"ilp"` — no BQM, calls `solver.solve()` with no arguments, result is a nested dict.
-- `"sqa"` — has `build_bqm()`, calls `solver.solve(num_reads, num_sweeps, beta_range)`.
-- `"qpu"` — has `build_bqm()`, calls `solver.solve(num_reads, annealing_time, chain_strength)`, captures hardware metadata via `solver.hardware_summary()`.
-
-The `name` is used as the key in the result JSON and in the progress output.
-
+The `type` field controls dispatch as described above; `name` is used
+as the result-JSON key and in progress output; `kwargs` (optional) are
+passed to the solver constructor.
 
 ## Adding a new solver
 
-1. Create the solver class (must subclass `SolverBase`).
-2. Import it in the relevant wrapper script.
-3. Add it to the appropriate registry list with the correct `type`.
-4. If it's a hardware solver, add the import inside `_get_hw_registry()` so the import is deferred and doesn't break environments without `dwave-system`.
+1. Implement the solver as a subclass of `SolverBase`.
+2. Add `build_bqm()` if it's QUBO-based.
+3. Import it in the relevant wrapper script and add it to the
+   appropriate registry list with the correct `type`.
+4. For hardware solvers, put the import inside `_get_hw_registry()` so
+   `dwave-system`-less environments still load.
+5. Add at least one ExactSolver-based oracle test in `tests/`.
 
-The core harness doesn't need to change.
+## Dependencies
 
-
-## Dependencies on other modules
-
-The harness imports from two utility modules that live outside this directory:
-
-- `util.calculate_solution_cost` — provides `calculate_solution_cost()` and `is_valid_solution()`, used to evaluate every solver's output.
-- `util.test_generation.json_to_dict` — provides `json_to_test_case()`, used to load test case JSON files into the tuple format the solver constructors expect.
+* `util.calculate_solution_cost` — cost + validity utilities.
+* `util.test_generation.json_to_dict` — `(nodes, …)` tuple loader.
+* `solvers.simulated_solvers.SQA_SF.calibrate_lambdas` (transitively,
+  via S2/S3) — instance-specific lambda calibration via
+  `dimod.ExactSolver` for small problems, heuristic for large ones.
